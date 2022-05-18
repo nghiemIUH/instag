@@ -1,0 +1,95 @@
+.post_item {
+    margin: 20px 0;
+    border: 1px solid rgba($color: #000000, $alpha: 0.2);
+    background-color: #fff;
+
+    .title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+
+        .user_info {
+            display: flex;
+            align-items: center;
+            img {
+                width: 50px;
+                height: 50px;
+                object-fit: cover;
+                border-radius: 50%;
+                margin-right: 10px;
+            }
+        }
+        .more {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: -20px;
+            cursor: pointer;
+        }
+    }
+
+    .post_content {
+        img {
+            width: 100%;
+        }
+    }
+
+    .footer {
+        padding: 15px;
+        font-size: 0.9rem;
+        .action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.5rem;
+
+            svg {
+                padding: 5px;
+                cursor: pointer;
+            }
+        }
+
+        span {
+            font-weight: bold;
+        }
+
+        .view_comment {
+            color: gray;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .create_time {
+            font-size: 0.7rem;
+            margin-top: 5px;
+            font-weight: 600;
+            color: gray;
+        }
+    }
+    .comment {
+        display: flex;
+        width: 100%;
+        padding: 10px 5px;
+        border: 1px solid rgba($color: #000000, $alpha: 0.2);
+        border-bottom: none;
+
+        .select_icon {
+            width: 5%;
+            cursor: pointer;
+        }
+
+        .comment_input {
+            margin-left: 5px;
+            width: 85%;
+            border: none;
+            &:focus {
+                outline: none;
+            }
+        }
+        .post {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+.home_left {
+    max-width: 50%;
+    height: 100%;
+    overflow: scroll;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media all and (max-width: 950px) {
+    .home_left {
+        max-width: 80%;
+        margin: 0 auto;
+    }
+}
