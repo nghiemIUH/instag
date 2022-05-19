@@ -2,21 +2,34 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User, UserInfo } from "../../entities/user";
 import { login_thunk } from "./thunk";
 
+interface UserState {
+    user: UserInfo;
+    access_token: string;
+    refresh_token: string;
+    loading: boolean;
+    error: boolean;
+    isLogin: boolean;
+}
+
 const initialState = {
-    user: {} as UserInfo,
+    user: {},
     access_token: "",
     refresh_token: "",
     loading: true,
     error: false,
     isLogin: false,
-};
+} as UserState;
 
 export const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        logout: (state = initialState, action: PayloadAction) => {
+        logout: (state: UserState, action: PayloadAction) => {
             state = initialState;
+        },
+
+        getUserReload: (state: UserState, action: PayloadAction) => {
+            //
         },
     },
     extraReducers: (builder) => {

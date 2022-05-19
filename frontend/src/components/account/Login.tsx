@@ -24,7 +24,7 @@ function Login() {
         if (userState.isLogin) {
             rediect("/");
         }
-    }, [rediect, userState]);
+    }, [rediect, userState.isLogin]);
 
     return (
         <div className={cls("login")}>
