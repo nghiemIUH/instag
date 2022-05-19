@@ -7,7 +7,7 @@ export interface UserInfo {
 }
 
 export interface User {
-    user: UserInfo | undefined;
+    user: UserInfo;
     access_token: string;
     refresh_token: string;
 }

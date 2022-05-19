@@ -7,7 +7,6 @@ import Login from "./components/account/Login";
 import Register from "./components/account/Register";
 
 function App() {
-    console.log(process.env);
     return (
         <div className="App">
             <Header />
