@@ -4,6 +4,7 @@ import style from "./Login.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { login_thunk } from "../../redux/user/thunk";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { changeRegister } from "../../redux/user/userSlice";
 
 const cls = classNames.bind(style);
 
@@ -26,9 +27,21 @@ function Login() {
         }
     }, [rediect, userState.isLogin]);
 
+    useEffect(() => {
+        dispatch(changeRegister());
+    }, [dispatch]);
+
     return (
         <div className={cls("login")}>
             <img src="key-chain.png" alt="" />
+            {userState.error ? (
+                <div className={cls("error")}>
+                    Username or password not invalid
+                </div>
+            ) : (
+                <></>
+            )}
+
             <form
                 action=""
                 style={{ width: "100%" }}

@@ -11,6 +11,11 @@
     border-radius: 10px;
     padding: 20px;
 
+    .error {
+        font-weight: 1.1rem;
+        color: red;
+    }
+
     img {
         width: 100px;
         margin-bottom: 50px;

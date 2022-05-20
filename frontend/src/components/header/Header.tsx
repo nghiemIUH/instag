@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import classNames from "classnames/bind";
 import { BsSearch } from "react-icons/bs";
 import {
@@ -10,14 +10,39 @@ import {
 } from "react-icons/ai";
 import { BiMessageAltAdd } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
-import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { logout } from "../../redux/user/userSlice";
+import { getNewToken_thunk, getUserReload_thunk } from "../../redux/user/thunk";
+import Cookies from "js-cookie";
 
-// ====================
 import style from "./header.module.scss";
 const cls = classNames.bind(style);
 
 function Header() {
     const [selectMenu, setSelectMenu] = useState("home");
+    const userState = useAppSelector((state) => state.user);
+
+    const dispatch = useAppDispatch();
+
+    const handleLogOut = () => {
+        dispatch(logout());
+    };
+
+    const refresh_token = Cookies.get("refresh_token") as string;
+    useEffect(() => {
+        dispatch(getUserReload_thunk(refresh_token || ""));
+    }, [dispatch, refresh_token]);
+
+    useEffect(() => {
+        const minute = 1000 * 60 * 1;
+        const interval = setInterval(() => {
+            if (userState.isLogin) {
+                dispatch(getNewToken_thunk(refresh_token || ""));
+            }
+        }, minute);
+
+        return () => clearInterval(interval);
+    });
 
     return (
         <div className={cls("header")}>
@@ -51,17 +76,24 @@ function Header() {
                 />
             </div>
             <div className={cls("avatar")}>
-                <img src="avatar.png" alt="" />
+                <img
+                    src={
+                        process.env.REACT_APP_URL +
+                        "/static/avatars/" +
+                        userState.user.avatar
+                    }
+                    alt=""
+                />
                 <div className={cls("sub_menu")}>
                     <div className={cls("profile")}>
-                        <Link to="/profile">
+                        <div>
                             <CgProfile /> Profile
-                        </Link>
+                        </div>
                     </div>
                     <div>
-                        <Link to="/login">
+                        <div onClick={handleLogOut}>
                             <AiOutlineLogout /> Logout
-                        </Link>
+                        </div>
                     </div>
                 </div>
             </div>

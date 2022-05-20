@@ -6,12 +6,13 @@ import { User, UserModel } from "../models/user";
 class UserController {
     async register(request: Request, response: Response) {
         const data = request.body as User;
+
         data.password = bcrypt.hashSync(data.password, 10);
         const oldUser = await UserModel.findOne({ username: data.username });
         if (oldUser) {
             response.status(404).send({ result: "user is existed" });
         } else {
-            data.avatar = request.file?.originalname as string;
+            data.avatar = request.file?.filename as string;
             const user = new UserModel(data);
             await user
                 .save()
@@ -67,6 +68,34 @@ class UserController {
             }
         } else {
             response.status(404).send({ result: "token not provided" });
+        }
+    }
+
+    getUserInfo(request: Request, response: Response) {
+        const token = request.body.refresh_token as string;
+        interface userHash {
+            data: User;
+        }
+        if (token) {
+            try {
+                const user = (
+                    verify(
+                        token,
+                        process.env.REFRESH_TOKEN_SECRET as string
+                    ) as userHash
+                ).data;
+
+                const access_token = sign(
+                    { data: user },
+                    process.env.ACCESS_TOKEN_SECRET as string,
+                    { expiresIn: process.env.ACCESS_TOKEN_LIFE }
+                );
+                response.status(200).send({ user, access_token });
+            } catch (error) {
+                response.status(404).send({ result: "token error" });
+            }
+        } else {
+            response.status(404).send({ result: "token error" });
         }
     }
 }

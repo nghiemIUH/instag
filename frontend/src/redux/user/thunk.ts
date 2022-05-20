@@ -1,6 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { UserInfo } from "../../entities/user";
-
 interface LoginInfo {
     username: string;
     password: string;
@@ -20,18 +18,65 @@ export const login_thunk = createAsyncThunk(
     }
 );
 
-export const register_thuk = createAsyncThunk(
+export const getNewToken_thunk = createAsyncThunk(
+    "user/get-new-token",
+    async (refresh_token: string, thunkAPI) => {
+        if (refresh_token === "") {
+            return thunkAPI.rejectWithValue("error");
+        }
+        const result = await fetch(
+            process.env.REACT_APP_URL + "/user/get-new-token",
+            {
+                method: "post",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ refresh_token }),
+            }
+        );
+        if (result.status === 200) {
+            return result.json();
+        }
+        return thunkAPI.rejectWithValue("error");
+    }
+);
+
+export const getUserReload_thunk = createAsyncThunk(
+    "user/get-user-reload",
+    async (refresh_token: string, thunkAPI) => {
+        if (refresh_token === "") {
+            return thunkAPI.rejectWithValue("error");
+        }
+
+        const result = await fetch(
+            process.env.REACT_APP_URL + "/user/get-user-reload",
+            {
+                method: "post",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ refresh_token }),
+            }
+        );
+        if (result.status === 200) {
+            return result.json();
+        }
+        return thunkAPI.rejectWithValue("error");
+    }
+);
+
+export const register_thunk = createAsyncThunk(
     "user/register",
-    async (userData: UserInfo, thunkAPI) => {
+    async (userData: FormData, thunkAPI) => {
         const result = await fetch(
             process.env.REACT_APP_URL + "/user/register",
             {
                 method: "post",
-                headers: { "content-type": "applocation/json" },
-                body: JSON.stringify(userData),
+                // headers: { "Content-Type": "multipart/form-data" },
+                body: userData,
             }
         );
         if (result.status === 200) return result.json();
-        return thunkAPI.rejectWithValue("err");
+        return thunkAPI.rejectWithValue("error");
     }
 );
