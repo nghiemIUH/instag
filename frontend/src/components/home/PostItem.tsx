@@ -6,22 +6,28 @@ import { BiMessageRounded } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import { BsBookmark } from "react-icons/bs";
 import { EmojiButton } from "@joeattardi/emoji-button";
+import Slider from "react-slick";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import PostThunk from "../../redux/post/thunk";
 
 const cls = classNames.bind(style);
 
 interface Props {
+    _id?: string;
     avatar: string;
     userName: string;
     images: Array<string>;
-
     num_like: number;
     description: string;
     num_comment: number;
-    create_time: number;
+    create_time: Date;
 }
 
 function PostItem(props: Props) {
     const [comment, setComment] = useState<string>("");
+    const userState = useAppSelector((state) => state.user);
+
+    const dispatch = useAppDispatch();
 
     const handleComment = (e: ChangeEvent<HTMLInputElement>) => {
         setComment(e.target.value);
@@ -44,12 +50,29 @@ function PostItem(props: Props) {
         trigger.addEventListener("click", () => picker.togglePicker(trigger));
     }, []);
 
+    const settings = {
+        dots: true,
+    };
+
+    const handleLike = () => {
+        const username = userState.user.username;
+        const _id = props._id as string;
+        dispatch(PostThunk.like()({ username, _id }));
+    };
+
     return (
         <div className={cls("post_item")}>
             {/* title */}
             <div className={cls("title")}>
                 <div className={cls("user_info")}>
-                    <img src="girl1.jpg" alt="" />
+                    <img
+                        src={
+                            process.env.REACT_APP_URL +
+                            "/static/avatars/" +
+                            props.avatar
+                        }
+                        alt=""
+                    />
                     <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>
                         {props.userName}
                     </div>
@@ -58,16 +81,28 @@ function PostItem(props: Props) {
             </div>
             {/* content */}
             <div className={cls("post_content")}>
-                {props.images.map((value, index) => {
-                    return <img src={value} alt="" key={index} />;
-                })}
+                <Slider {...settings}>
+                    {props.images.map((value, index) => {
+                        return (
+                            <img
+                                src={
+                                    process.env.REACT_APP_URL +
+                                    "/static/post/" +
+                                    value
+                                }
+                                alt=""
+                                key={index}
+                            />
+                        );
+                    })}
+                </Slider>
             </div>
 
             <div className={cls("footer")}>
                 {/* action */}
                 <div className={cls("action")}>
                     <div className={cls("action_left")}>
-                        <AiOutlineHeart />
+                        <AiOutlineHeart onClick={handleLike} />
                         <BiMessageRounded />
                         <FiSend />
                     </div>
@@ -95,7 +130,7 @@ function PostItem(props: Props) {
                 </div>
                 {/* create time */}
                 <div className={cls("create_time")}>
-                    {props.create_time} HOURS AGO
+                    {formatTime(props.create_time)}
                 </div>
             </div>
 
@@ -129,5 +164,28 @@ function PostItem(props: Props) {
         </div>
     );
 }
+
+const formatTime = (dateTime: Date) => {
+    const minute = Math.abs(new Date().getTime() - dateTime.getTime()) / 6e4;
+    if (minute < 60) {
+        return `${parseInt(minute + "")} minutes ago`;
+    }
+
+    const hour = minute / 60;
+
+    if (hour < 24) {
+        return `${parseInt(hour + "")} hours ago`;
+    }
+    const day = hour / 24;
+    if (day < 4) {
+        return `${parseInt(day + "")} days ago`;
+    }
+
+    const year = dateTime.getFullYear();
+    const month = dateTime.getMonth() + 1;
+    const date = dateTime.getDate();
+
+    return `${date}/${month}/${year}`;
+};
 
 export default PostItem;

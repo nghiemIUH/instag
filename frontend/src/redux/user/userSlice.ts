@@ -62,6 +62,7 @@ export const userSlice = createSlice({
         builder.addCase(getNewToken_thunk.fulfilled, (state, action) => {
             state.access_token = action.payload.access_token;
             state.isLogin = true;
+            state.error = false
             Cookies.set("access_token", action.payload.access_token);
         });
 
@@ -76,6 +77,8 @@ export const userSlice = createSlice({
             state.user = action.payload.user;
             state.refresh_token = Cookies.get("refresh_token") as string;
             state.isLogin = true;
+            state.error = false
+
         });
 
         builder.addCase(getUserReload_thunk.rejected, (state, action) => {
@@ -86,6 +89,8 @@ export const userSlice = createSlice({
 
         builder.addCase(register_thunk.fulfilled, (state, action) => {
             state.isRegister = true;
+            state.error = false
+
         });
 
         builder.addCase(register_thunk.rejected, (state, action) => {

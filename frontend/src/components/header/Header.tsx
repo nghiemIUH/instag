@@ -12,14 +12,17 @@ import { BiMessageAltAdd } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { logout } from "../../redux/user/userSlice";
-import { getNewToken_thunk, getUserReload_thunk } from "../../redux/user/thunk";
+import { getNewToken_thunk } from "../../redux/user/thunk";
 import Cookies from "js-cookie";
-
 import style from "./header.module.scss";
+
+import UploadPost from "./UploadPost";
+
 const cls = classNames.bind(style);
 
 function Header() {
     const [selectMenu, setSelectMenu] = useState("home");
+
     const userState = useAppSelector((state) => state.user);
 
     const dispatch = useAppDispatch();
@@ -29,9 +32,6 @@ function Header() {
     };
 
     const refresh_token = Cookies.get("refresh_token") as string;
-    useEffect(() => {
-        dispatch(getUserReload_thunk(refresh_token || ""));
-    }, [dispatch, refresh_token]);
 
     useEffect(() => {
         const minute = 1000 * 60 * 1;
@@ -40,9 +40,18 @@ function Header() {
                 dispatch(getNewToken_thunk(refresh_token || ""));
             }
         }, minute);
-
         return () => clearInterval(interval);
     });
+
+    const [modalIsOpen, setIsOpen] = useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     return (
         <div className={cls("header")}>
@@ -62,8 +71,11 @@ function Header() {
                 />
                 <BiMessageAltAdd
                     style={{ color: selectMenu === "add" ? "red" : "black" }}
-                    onClick={() => setSelectMenu("add")}
+                    onClick={openModal}
                 />
+
+                <UploadPost modalIsOpen={modalIsOpen} closeModal={closeModal} />
+
                 <AiOutlineCompass
                     style={{
                         color: selectMenu === "compass" ? "red" : "black",
@@ -75,6 +87,7 @@ function Header() {
                     onClick={() => setSelectMenu("heart")}
                 />
             </div>
+
             <div className={cls("avatar")}>
                 <img
                     src={

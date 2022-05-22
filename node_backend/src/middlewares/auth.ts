@@ -1,19 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
 
-interface RequestAfterMDW extends Request {
-    jwt_data: Object;
-}
-
 const authen = (request: Request, response: Response, next: NextFunction) => {
-    const token = request.headers["x-jwt-token"] as string;
+    let token = request.headers["authorization"] as string;
+
     if (token) {
         try {
-            const jwt_data = verify(
-                token,
-                process.env.ACCESS_TOKEN_SECRET as string
-            );
-            (request as RequestAfterMDW).jwt_data = jwt_data;
+            token = token.split(" ")[1];
+            verify(token, process.env.ACCESS_TOKEN_SECRET as string);
             next();
         } catch (error) {
             return response.status(404).send({ result: "not authen" });
