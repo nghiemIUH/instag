@@ -26,7 +26,7 @@ function HomeLeft() {
                         userName={value.author.username}
                         avatar={value.author.avatar}
                         images={value.images}
-                        num_like={value.likes.length}
+                        likes={value.likes}
                         num_comment={value.comments.length}
                         description={value.content}
                         create_time={new Date(value.date_update)}

@@ -11,16 +11,7 @@ function Story() {
                 <div className={cls("user_id")}>girl.music.19</div>
             </div>
             <div className={cls("story_item")}>
-                <img src="girl2.jpg" alt="" />
-                <div className={cls("user_id")}>girl.music.19</div>
-            </div>
-
-            <div className={cls("story_item")}>
                 <img src="girl1.jpg" alt="" />
-                <div className={cls("user_id")}>girl.music.19</div>
-            </div>
-            <div className={cls("story_item")}>
-                <img src="girl2.jpg" alt="" />
                 <div className={cls("user_id")}>girl.music.19</div>
             </div>
         </div>

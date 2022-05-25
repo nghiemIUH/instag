@@ -64,11 +64,67 @@ class PostThunk {
                     process.env.REACT_APP_URL + "/post/like",
                     {
                         method: "post",
-                        body: JSON.stringify({ data }),
+                        body: JSON.stringify(data),
                         headers: {
                             Authorization: "Bearer " + access_token,
                             "content-type": "application/json",
                         },
+                    }
+                );
+                if (result.status === 200) {
+                    return result.json();
+                }
+                return thunkAPI.rejectWithValue("error");
+            }
+        );
+    }
+
+    static addComment() {
+        interface DataComment {
+            user_id: string;
+            content: string;
+        }
+        const access_token = Cookies.get("access_token");
+        return createAsyncThunk(
+            "post/add-comment",
+            async (data: DataComment, thunkAPI) => {
+                const result = await fetch(
+                    process.env.REACT_APP_URL + "/post/add-comment",
+                    {
+                        method: "post",
+                        headers: {
+                            Authorization: "Bearer " + access_token,
+                            "content-type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    }
+                );
+                if (result.status === 200) {
+                    return result.json();
+                }
+                return thunkAPI.rejectWithValue("error");
+            }
+        );
+    }
+    static comment() {
+        interface DataComment {
+            username: string;
+            _id: string;
+            content: string;
+        }
+        return createAsyncThunk(
+            "post/comment",
+            async (data: DataComment, thunkAPI) => {
+                const access_token = Cookies.get("access_token");
+                const result = await fetch(
+                    process.env.REACT_APP_URL + "/post/comment",
+                    {
+                        method: "post",
+                        headers: {
+                            Authorization: "Bearer " + access_token,
+                            "content-type": "application/json",
+                        },
+                        body: JSON.stringify(data),
                     }
                 );
                 if (result.status === 200) {

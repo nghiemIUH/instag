@@ -39,11 +39,43 @@ class Post {
     async likePost(request: Request, response: Response) {
         const data = request.body;
         const user = await UserModel.findOne({ username: data.username });
-        const post = (await PostModel.findById(data._id)) as PostIF;
+        const post = await PostModel.findById(data._id);
 
-        console.log(data);
+        if (post?.likes.includes(user?.id)) {
+            await PostModel.updateOne(
+                { _id: data._id },
+                { $pullAll: { likes: [user?.id] } }
+            );
+            return response
+                .status(200)
+                .send({ user_id: user?.id, post_id: data._id, status: "dis" });
+        } else {
+            await PostModel.updateOne(
+                { _id: data._id },
+                { $push: { likes: user } }
+            );
+            return response
+                .status(200)
+                .send({ user_id: user?.id, post_id: data._id, status: "like" });
+        }
+    }
 
-        return response.status(200).send({ result: "test" });
+    async addComment(request: Request, response: Response) {
+        const data = request.body;
+        const user = await UserModel.findOne({ username: data.username });
+        await PostModel.updateOne(
+            { _id: data._id },
+            { $push: { comments: [{ author: user, content: data.content }] } }
+        );
+        return response.status(200).send({ result: "success" });
+    }
+
+    async getComment(request: Request, response: Response) {
+        const post_id = request.body.post_id;
+        const post_comment = await PostModel.findById(post_id)
+            .populate({ path: "comments.author", select: "avatar username" })
+            .select("comments");
+        return response.status(200).send({ comments: post_comment?.comments });
     }
 }
 

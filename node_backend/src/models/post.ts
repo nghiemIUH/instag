@@ -5,8 +5,8 @@ interface Post {
     content: string;
     date_update: Date;
     images: Array<string>;
-    comments: Array<any>;
-    likes: Array<string>;
+    comments: any;
+    likes: Array<any>;
 }
 
 interface Comment {
@@ -26,8 +26,8 @@ const postSchema = new Schema<Post>({
     content: { type: Schema.Types.String },
     date_update: { type: Schema.Types.Date, default: Date.now },
     images: { type: Schema.Types.Array },
-    likes: { type: Schema.Types.Array, ref: "User" },
-    comments: { type: Schema.Types.Array, of: commentSchema },
+    likes: { type: [Schema.Types.ObjectId], ref: "User" },
+    comments: { type: [commentSchema], required: true },
 });
 
 const PostModel = model<Post>("Post", postSchema);

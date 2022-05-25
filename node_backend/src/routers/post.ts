@@ -8,5 +8,7 @@ postRouter.use(authen);
 postRouter.post("/add", post.addPost);
 postRouter.get("/get-all", post.getAll);
 postRouter.post("/like", post.likePost);
+postRouter.post("/comment", post.addComment);
+postRouter.post("/get-comment", post.getComment);
 
 export default postRouter;

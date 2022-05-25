@@ -98,7 +98,7 @@ function Header() {
                     alt=""
                 />
                 <div className={cls("sub_menu")}>
-                    <div className={cls("profile")}>
+                    <div>
                         <div>
                             <CgProfile /> Profile
                         </div>

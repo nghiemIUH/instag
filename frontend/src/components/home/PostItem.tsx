@@ -1,7 +1,7 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState, memo, FormEvent } from "react";
 import classNames from "classnames/bind";
 import style from "./PostItem.module.scss";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { BiMessageRounded } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import { BsBookmark } from "react-icons/bs";
@@ -9,6 +9,8 @@ import { EmojiButton } from "@joeattardi/emoji-button";
 import Slider from "react-slick";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import PostThunk from "../../redux/post/thunk";
+import Comment from "./Comment";
+import Cookies from "js-cookie";
 
 const cls = classNames.bind(style);
 
@@ -17,21 +19,30 @@ interface Props {
     avatar: string;
     userName: string;
     images: Array<string>;
-    num_like: number;
+    likes: Array<string>;
     description: string;
     num_comment: number;
     create_time: Date;
 }
 
 function PostItem(props: Props) {
-    const [comment, setComment] = useState<string>("");
     const userState = useAppSelector((state) => state.user);
+    const [comments, setComments] = useState<Array<any>>();
 
     const dispatch = useAppDispatch();
 
-    const handleComment = (e: ChangeEvent<HTMLInputElement>) => {
-        setComment(e.target.value);
-    };
+    const [modalIsOpen, setIsOpen] = useState(false);
+
+    function openModal() {
+        if (!modalIsOpen) {
+            handleViewComment();
+        }
+        setIsOpen((prev) => true);
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     useEffect(() => {
         const picker = new EmojiButton({
@@ -58,6 +69,39 @@ function PostItem(props: Props) {
         const username = userState.user.username;
         const _id = props._id as string;
         dispatch(PostThunk.like()({ username, _id }));
+    };
+
+    const handleComment = (e: FormEvent) => {
+        e.preventDefault();
+        const content = (
+            document.getElementById("comment_input") as HTMLInputElement
+        ).value;
+
+        const username = userState.user.username;
+        const _id = props._id as string;
+        dispatch(PostThunk.comment()({ username, _id, content }));
+    };
+
+    const handleViewComment = () => {
+        const access_token = Cookies.get("access_token");
+        const result = fetch(process.env.REACT_APP_URL + "/post/get-comment", {
+            method: "post",
+            headers: {
+                Authorization: "Bearer " + access_token,
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({ post_id: props._id }),
+        });
+        result
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                setComments(data.comments);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     };
 
     return (
@@ -102,7 +146,15 @@ function PostItem(props: Props) {
                 {/* action */}
                 <div className={cls("action")}>
                     <div className={cls("action_left")}>
-                        <AiOutlineHeart onClick={handleLike} />
+                        {props.likes.includes(userState.user._id as string) ? (
+                            <AiFillHeart
+                                onClick={handleLike}
+                                style={{ color: "red" }}
+                            />
+                        ) : (
+                            <AiOutlineHeart onClick={handleLike} />
+                        )}
+
                         <BiMessageRounded />
                         <FiSend />
                     </div>
@@ -117,7 +169,7 @@ function PostItem(props: Props) {
                         fontWeight: 600,
                     }}
                 >
-                    {props.num_like} likes
+                    {props.likes.length} likes
                 </div>
 
                 {/* description */}
@@ -125,16 +177,22 @@ function PostItem(props: Props) {
                     <span>{props.userName}</span> {props.description}
                 </div>
 
-                <div className={cls("view_comment")}>
+                <div className={cls("view_comment")} onClick={openModal}>
                     View all {props.num_comment} comments
                 </div>
+                <Comment
+                    modalIsOpen={modalIsOpen}
+                    closeModal={closeModal}
+                    images={props.images}
+                    comments={comments}
+                />
                 {/* create time */}
                 <div className={cls("create_time")}>
                     {formatTime(props.create_time)}
                 </div>
             </div>
 
-            <div className={cls("comment")}>
+            <form className={cls("comment")} onSubmit={(e) => handleComment(e)}>
                 <img
                     src="1f600.png"
                     alt=""
@@ -146,21 +204,17 @@ function PostItem(props: Props) {
                     id="comment_input"
                     className={cls("comment_input")}
                     placeholder="Add a comment"
-                    onChange={(e) => handleComment(e)}
                 />
-                <div
+                <button
                     id="post"
                     className={cls("post")}
                     style={{
-                        color:
-                            comment.length === 0
-                                ? "rgba(0, 0, 255, 0.3)"
-                                : "rgba(0, 0, 255, 0.8)",
+                        color: "rgba(0, 0, 255, 0.8)",
                     }}
                 >
                     Post
-                </div>
-            </div>
+                </button>
+            </form>
         </div>
     );
 }
@@ -188,4 +242,4 @@ const formatTime = (dateTime: Date) => {
     return `${date}/${month}/${year}`;
 };
 
-export default PostItem;
+export default memo(PostItem);

@@ -1,0 +1,11 @@
+@media all and (max-width: 950px) {
+    .ReactModal__Content {
+        width: 80% !important;
+        height: 50vh !important;
+    }
+}
+
+.slick-next,
+.slick-next:before {
+    margin-left: -60px;
+}

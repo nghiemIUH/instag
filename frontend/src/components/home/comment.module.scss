@@ -1,0 +1,86 @@
+.comment_content {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    .comment_img {
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-right: 1%;
+    }
+
+    .comment {
+        width: 50%;
+        height: 100%;
+        padding: 5px;
+
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        .cmt_items {
+            background-color: rgba($color: #000000, $alpha: 0.03);
+            height: 95%;
+            overflow-y: auto;
+            padding: 5px;
+            border-radius: 10px;
+            .cmt_item {
+                display: flex;
+                align-items: center;
+                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+                padding: 10px 0;
+                .cmt_user_avatar {
+                    width: 50px;
+                    object-fit: contain;
+                    border-radius: 50%;
+                    margin-right: 10px;
+                }
+                .cmt_content {
+                    div:last-child {
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        margin-top: 10px;
+                    }
+                }
+            }
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+        .cmt_input_block {
+            height: 5%;
+            display: flex;
+            width: 100%;
+            margin-top: 10px;
+            background-color: #fff;
+
+            .select_icon {
+                cursor: pointer;
+            }
+
+            input {
+                width: 90%;
+                border: none;
+                font-size: 0.8rem;
+                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+                padding: 10px;
+
+                &:focus {
+                    outline: none;
+                    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.3);
+                }
+            }
+            button {
+                width: 10%;
+                margin-left: 5px;
+                border: none;
+                cursor: pointer;
+                color: blue;
+                font-weight: 600;
+                background-color: #fff;
+            }
+        }
+    }
+}
