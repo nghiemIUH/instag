@@ -22,22 +22,85 @@
     }
 
     .group {
+        position: relative;
+        margin-bottom: 45px;
         width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        margin: 10px 0;
 
         label {
-            flex: 0.3;
+            color: #999;
+            font-size: 18px;
+            font-weight: normal;
+            position: absolute;
+            pointer-events: none;
+            left: 5px;
+            top: 10px;
+            transition: 0.2s ease all !important;
+            -moz-transition: 0.2s ease all !important;
+            -webkit-transition: 0.2s ease all !important;
         }
 
         input {
-            flex: 0.7;
-            padding: 5px;
+            font-size: 18px;
+            padding: 10px 0;
+            display: block;
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #757575;
             &:focus {
                 outline: none;
             }
+            &:focus ~ label,
+            &:valid ~ label {
+                top: -20px;
+                font-size: 14px;
+                color: #5264ae;
+            }
+
+            &:focus ~ .bar:before,
+            &:focus ~ .bar:after {
+                width: 50%;
+            }
+
+            &:focus ~ .highlight {
+                -webkit-animation: inputHighlighter 0.3s ease;
+                -moz-animation: inputHighlighter 0.3s ease;
+                animation: inputHighlighter 0.3s ease;
+            }
+        }
+
+        .bar {
+            position: relative;
+            display: block;
+            width: 100%;
+
+            &:before,
+            &:after {
+                content: "";
+                height: 2px;
+                width: 0;
+                bottom: 1px;
+                position: absolute;
+                background: #5264ae;
+                transition: 0.2s ease all;
+                -moz-transition: 0.2s ease all;
+                -webkit-transition: 0.2s ease all;
+            }
+            &:before {
+                left: 50%;
+            }
+            &:after {
+                right: 50%;
+            }
+        }
+
+        .highlight {
+            position: absolute;
+            height: 60%;
+            width: 100%;
+            top: 25%;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.5;
         }
     }
 
@@ -78,5 +141,34 @@
         &:hover {
             background-position: right center;
         }
+    }
+}
+
+/* ANIMATIONS ================ */
+@-webkit-keyframes inputHighlighter {
+    from {
+        background: #5264ae;
+    }
+    to {
+        width: 0;
+        background: transparent;
+    }
+}
+@-moz-keyframes inputHighlighter {
+    from {
+        background: #5264ae;
+    }
+    to {
+        width: 0;
+        background: transparent;
+    }
+}
+@keyframes inputHighlighter {
+    from {
+        background: #5264ae;
+    }
+    to {
+        width: 0;
+        background: transparent;
     }
 }

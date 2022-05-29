@@ -11,6 +11,8 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import PostThunk from "../../redux/post/thunk";
 import Comment from "./Comment";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const cls = classNames.bind(style);
 
@@ -25,24 +27,14 @@ interface Props {
     create_time: Date;
 }
 
+// toast.configure();
+
 function PostItem(props: Props) {
     const userState = useAppSelector((state) => state.user);
     const [comments, setComments] = useState<Array<any>>();
+    const [isOpen, setIsOpen] = useState(false);
 
     const dispatch = useAppDispatch();
-
-    const [modalIsOpen, setIsOpen] = useState(false);
-
-    function openModal() {
-        if (!modalIsOpen) {
-            handleViewComment();
-        }
-        setIsOpen((prev) => true);
-    }
-
-    function closeModal() {
-        setIsOpen(false);
-    }
 
     useEffect(() => {
         const picker = new EmojiButton({
@@ -71,15 +63,24 @@ function PostItem(props: Props) {
         dispatch(PostThunk.like()({ username, _id }));
     };
 
+    const notify = () => {
+        console.log("toast");
+
+        toast.success("Success Notification !", {
+            position: toast.POSITION.TOP_CENTER,
+        });
+    };
     const handleComment = (e: FormEvent) => {
         e.preventDefault();
-        const content = (
-            document.getElementById("comment_input") as HTMLInputElement
-        ).value;
-
+        const comment_input = document.getElementById(
+            "comment_input"
+        ) as HTMLInputElement;
+        const content = comment_input.value;
         const username = userState.user.username;
         const _id = props._id as string;
+        notify();
         dispatch(PostThunk.comment()({ username, _id, content }));
+        comment_input.value = "";
     };
 
     const handleViewComment = () => {
@@ -97,7 +98,8 @@ function PostItem(props: Props) {
                 return response.json();
             })
             .then((data) => {
-                setComments(data.comments);
+                setComments((prev) => data.comments);
+                setIsOpen((prev) => true);
             })
             .catch((e) => {
                 console.log(e);
@@ -177,15 +179,22 @@ function PostItem(props: Props) {
                     <span>{props.userName}</span> {props.description}
                 </div>
 
-                <div className={cls("view_comment")} onClick={openModal}>
-                    View all {props.num_comment} comments
+                <div
+                    onClick={handleViewComment}
+                    className={cls("view_comment")}
+                >
+                    View all comment
                 </div>
-                <Comment
-                    modalIsOpen={modalIsOpen}
-                    closeModal={closeModal}
-                    images={props.images}
-                    comments={comments}
-                />
+
+                {isOpen && (
+                    <Comment
+                        images={props.images}
+                        comments={comments}
+                        isOpen={isOpen}
+                        setIsOpen={setIsOpen}
+                    />
+                )}
+
                 {/* create time */}
                 <div className={cls("create_time")}>
                     {formatTime(props.create_time)}
@@ -204,6 +213,7 @@ function PostItem(props: Props) {
                     id="comment_input"
                     className={cls("comment_input")}
                     placeholder="Add a comment"
+                    autoComplete="off"
                 />
                 <button
                     id="post"

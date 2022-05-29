@@ -48,18 +48,20 @@ function Login() {
                 onSubmit={(e) => handleLogin(e)}
             >
                 <div className={cls("group")}>
-                    <label htmlFor="">Username</label>
                     <input
                         type="text"
                         onChange={(e) => setUsername(e.target.value)}
                     />
+                    <label>Username</label>
+                    <span className={cls("bar")}></span>
                 </div>
                 <div className={cls("group")}>
-                    <label htmlFor="">Password</label>
                     <input
                         type="password"
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <span className={cls("bar")}></span>
+                    <label>Password</label>
                 </div>
                 <div className={cls("redirect")}>
                     <Link to="/">Forgot Password</Link>

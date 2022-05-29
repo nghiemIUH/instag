@@ -1,85 +1,156 @@
-.comment_content {
+/* If you like this, be sure to ❤️ it. */
+.wrapper {
     display: flex;
-    height: 100%;
-    width: 100%;
-    .comment_img {
-        width: 50%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        margin-right: 1%;
+    font-weight: 550;
+    cursor: pointer;
+    font-size: 0.8rem;
+
+    a {
+        display: inline-block;
+        text-decoration: none;
+        background-color: #fff;
+        border-radius: 3px;
+        color: gray;
+        font-family: "Roboto", sans-serif;
     }
+}
 
-    .comment {
-        width: 50%;
-        height: 100%;
-        padding: 5px;
+.modal {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(77, 77, 77, 0.7);
+    transition: all 0.4s;
+    z-index: 2;
+    margin-top: 10vh;
 
+    .modal__content {
+        border-radius: 4px;
+        position: relative;
+        max-width: 90%;
+        background: #fff;
         display: flex;
+        height: 80vh;
+        width: 80vw;
         flex-direction: column;
-        height: 100%;
-        .cmt_items {
-            background-color: rgba($color: #000000, $alpha: 0.03);
-            height: 95%;
-            overflow-y: auto;
-            padding: 5px;
-            border-radius: 10px;
-            .cmt_item {
-                display: flex;
-                align-items: center;
-                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
-                padding: 10px 0;
-                .cmt_user_avatar {
-                    width: 50px;
-                    object-fit: contain;
-                    border-radius: 50%;
-                    margin-right: 10px;
-                }
-                .cmt_content {
-                    div:last-child {
-                        font-size: 0.8rem;
-                        font-weight: 600;
-                        margin-top: 10px;
-                    }
-                }
-            }
-            &::-webkit-scrollbar {
-                display: none;
+
+        .modal_header {
+            height: 5%;
+            width: 100%;
+
+            .modal__close {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                color: #585858;
+                text-decoration: none;
+                cursor: pointer;
+                font-size: 1.3rem;
             }
         }
 
-        .cmt_input_block {
-            height: 5%;
+        .modal_body {
             display: flex;
             width: 100%;
-            margin-top: 10px;
-            background-color: #fff;
+            height: 100%;
 
-            .select_icon {
-                cursor: pointer;
+            .slider_img {
+                height: 100%;
+                max-width: 65%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
             }
 
-            input {
-                width: 90%;
-                border: none;
-                font-size: 0.8rem;
-                border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
-                padding: 10px;
+            .list_cmt {
+                width: 50%;
+                height: 98%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background-color: rgba($color: #f0f2f5, $alpha: 0.8);
+                padding: 10px 10px 0 10px;
+                border-radius: 10px;
 
-                &:focus {
-                    outline: none;
-                    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.3);
+                .cmt_top {
+                    height: 90%;
+                    overflow-y: auto;
+
+                    &::-webkit-scrollbar {
+                        display: none;
+                    }
+
+                    .cmt_item {
+                        display: flex;
+                        margin-bottom: 10px;
+                        img {
+                            width: 40px;
+                            height: 40px;
+                            object-fit: cover;
+                            border-radius: 50%;
+                            margin-right: 15px;
+                        }
+
+                        .cmt_content {
+                            display: flex;
+                            flex-direction: column;
+
+                            .cmt_content_info {
+                                border: 0.3px solid rgba(77, 77, 77, 0.3);
+                                background-color: rgba(
+                                    $color: #f0f2f5,
+                                    $alpha: 0.6
+                                );
+                                padding: 0 20px 10px 10px;
+                                border-radius: 10px;
+
+                                .cmt_content_user {
+                                    font-weight: 800;
+                                }
+                            }
+                            .cmt_content_time {
+                                font-size: 0.7rem;
+                                font-weight: 600;
+                            }
+                        }
+                    }
                 }
-            }
-            button {
-                width: 10%;
-                margin-left: 5px;
-                border: none;
-                cursor: pointer;
-                color: blue;
-                font-weight: 600;
-                background-color: #fff;
+
+                .cmt_bottom {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+
+                    input {
+                        width: 100%;
+                        padding: 10px 10px 10px 5px;
+                        border: none;
+                        border-bottom: 1px solid rgba(77, 77, 77, 0.3);
+                        background-color: rgba($color: #f0f2f5, $alpha: 1);
+
+                        &:focus {
+                            outline: none;
+                            border-bottom: 1px solid rgba(77, 77, 77, 0.7);
+                        }
+                    }
+                    button {
+                        background-color: #fff;
+                        border: none;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        color: blue;
+                        font-weight: 600;
+                        padding: 10px 10px 10px 5px;
+                        background-color: rgba($color: #f0f2f5, $alpha: 0.8);
+                    }
+                }
             }
         }
     }

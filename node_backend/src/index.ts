@@ -5,6 +5,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import routers from "./routers/index";
 import connectDB from "./config/connect";
+import { Server, Socket } from "socket.io";
+import { createServer } from "http";
 
 dotenv.config();
 const PORT: number = parseInt(process.env.PORT as string);
@@ -19,4 +21,18 @@ app.use(cors());
 routers(app);
 connectDB();
 
-app.listen(PORT);
+const server = createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+    },
+    // path: "/test/",
+});
+io.on("connection", (socket: Socket) => {
+    socket.on("test-data", (data) => {
+        console.log(data);
+    });
+});
+
+server.listen(PORT);
