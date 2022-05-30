@@ -1,4 +1,4 @@
-import React from "react";
+import { memo } from "react";
 import classNames from "classnames/bind";
 import style from "./Home.module.scss";
 
@@ -16,4 +16,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default memo(Home);

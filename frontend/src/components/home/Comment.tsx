@@ -1,18 +1,70 @@
-import { memo } from "react";
-import Modal from "react-modal";
+import { FormEvent, memo, useEffect, useState, useContext } from "react";
 import classNames from "classnames/bind";
 import style from "./Comment.module.scss";
 import Slider from "react-slick";
 import "./Comment.css";
+import { Socket } from "socket.io-client";
+import Cookies from "js-cookie";
+import { useAppSelector } from "../../redux/hooks";
+import SocketContext from "../context/socket";
 
 const cls = classNames.bind(style);
 
-Modal.setAppElement("#root");
-function Comment({ images, comments, isOpen, setIsOpen }: Props) {
-    console.log("render");
+function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
+    const { socket } = useContext(SocketContext) as SocketContextType;
+    console.log(socket);
+
+    const [comments, setComments] = useState<Array<CommentType>>([]);
+    const user = useAppSelector((state) => state.user);
+    useEffect(() => {
+        const access_token = Cookies.get("access_token");
+        const result = fetch(process.env.REACT_APP_URL + "/post/get-comment", {
+            method: "post",
+            headers: {
+                Authorization: "Bearer " + access_token,
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({ post_id }),
+        });
+        result
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                setComments(data.comments);
+            })
+            .catch((e) => {});
+    }, []);
+
+    useEffect(() => {
+        socket?.on(post_id as string, (data) => {
+            console.log(data);
+            setComments((prev) => {
+                return [...prev, data];
+            });
+        });
+    }, []);
+
+    const handleSubmitComment = (e: FormEvent) => {
+        e.preventDefault();
+        const comment_input = document.getElementById(
+            "cmt_input"
+        ) as HTMLInputElement;
+
+        socket?.emit("add-comment", {
+            content: comment_input.value,
+            post_id: post_id,
+            author: {
+                avatar: user.user.avatar,
+                username: user.user.username,
+            },
+            date: new Date(),
+        });
+        comment_input.value = "";
+    };
 
     return (
-        <div style={{}}>
+        <div>
             <div className={cls("wrapper")}></div>
 
             <div
@@ -24,7 +76,9 @@ function Comment({ images, comments, isOpen, setIsOpen }: Props) {
                     <div className={cls("modal_header")}>
                         <div
                             className={cls("modal__close")}
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => {
+                                setIsOpen((prev: boolean) => false);
+                            }}
                         >
                             &times;
                         </div>
@@ -99,13 +153,18 @@ function Comment({ images, comments, isOpen, setIsOpen }: Props) {
                                 })}
                             </div>
 
-                            <div className={cls("cmt_bottom")}>
+                            <form
+                                className={cls("cmt_bottom")}
+                                onSubmit={(e) => handleSubmitComment(e)}
+                            >
                                 <input
                                     type="text"
                                     placeholder="Input comment..."
+                                    id="cmt_input"
+                                    autoComplete="off"
                                 />
                                 <button>Post</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -145,7 +204,21 @@ interface Props {
     setIsOpen?: any;
     isOpen?: boolean;
     images: Array<string>;
-    comments: Array<any> | undefined;
+    post_id: string | undefined;
+}
+
+interface SocketContextType {
+    socket: Socket | null;
+    connect: () => void;
+    disconnect: () => void;
+}
+interface CommentType {
+    content: string;
+    author: {
+        username: string;
+        avatar: string;
+    };
+    date: string;
 }
 
 export default memo(Comment);

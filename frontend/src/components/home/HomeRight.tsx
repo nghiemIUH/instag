@@ -1,4 +1,4 @@
-import React from "react";
+import { memo } from "react";
 import classNames from "classnames/bind";
 import style from "./HomeRight.module.scss";
 
@@ -67,4 +67,4 @@ function HomeRight() {
     );
 }
 
-export default HomeRight;
+export default memo(HomeRight);

@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import { useEffect, memo } from "react";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/header/Header";
@@ -11,12 +11,12 @@ import Cookies from "js-cookie";
 
 function App() {
     const userState = useAppSelector((state) => state.user);
-    const dispatch = useAppDispatch()
-    const refresh_token = Cookies.get('refresh_token')
+    const dispatch = useAppDispatch();
+    const refresh_token = Cookies.get("refresh_token");
 
     useEffect(() => {
         dispatch(getUserReload_thunk(refresh_token || ""));
-    }, [dispatch, refresh_token]);
+    }, []);
 
     return (
         <div className="App">
@@ -52,4 +52,4 @@ const PrivateRoute = ({ Component, logits, redirect }: any) => {
     return logits ? Component : <Navigate to={redirect} />;
 };
 
-export default App;
+export default memo(App);

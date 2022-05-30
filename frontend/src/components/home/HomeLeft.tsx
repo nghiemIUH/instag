@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, memo } from "react";
 import classNames from "classnames/bind";
 import style from "./HomeLeft.module.scss";
 import PostItem from "./PostItem";
@@ -14,7 +14,7 @@ function HomeLeft() {
 
     useEffect(() => {
         dispatch(PostThunk.getAllPost()());
-    }, [dispatch]);
+    }, []);
 
     return (
         <div className={cls("home_left")}>
@@ -38,4 +38,4 @@ function HomeLeft() {
     );
 }
 
-export default HomeLeft;
+export default memo(HomeLeft);

@@ -1,7 +1,8 @@
 .home_left {
-    max-width: 50%;
+    max-width: 70%;
     height: 100%;
     overflow: scroll;
+    min-width: 45%;
 
     &::-webkit-scrollbar {
         display: none;
@@ -12,5 +13,6 @@
     .home_left {
         max-width: 80%;
         margin: 0 auto;
+        min-width: 60%;
     }
 }

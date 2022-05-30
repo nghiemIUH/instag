@@ -1,4 +1,4 @@
-import React from "react";
+import { memo } from "react";
 import classNames from "classnames/bind";
 import style from "./Story.module.scss";
 
@@ -18,4 +18,4 @@ function Story() {
     );
 }
 
-export default Story;
+export default memo(Story);

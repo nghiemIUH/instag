@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, FormEvent } from "react";
+import { useEffect, useState, memo, FormEvent, useRef } from "react";
 import classNames from "classnames/bind";
 import style from "./PostItem.module.scss";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
@@ -10,8 +10,7 @@ import Slider from "react-slick";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import PostThunk from "../../redux/post/thunk";
 import Comment from "./Comment";
-import Cookies from "js-cookie";
-import { toast } from "react-toastify";
+import { toast, ToastContainer, Id } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const cls = classNames.bind(style);
@@ -27,13 +26,9 @@ interface Props {
     create_time: Date;
 }
 
-// toast.configure();
-
 function PostItem(props: Props) {
     const userState = useAppSelector((state) => state.user);
-    const [comments, setComments] = useState<Array<any>>();
     const [isOpen, setIsOpen] = useState(false);
-
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -63,12 +58,20 @@ function PostItem(props: Props) {
         dispatch(PostThunk.like()({ username, _id }));
     };
 
+    const toastId = useRef<Id | null>(null);
     const notify = () => {
-        console.log("toast");
-
-        toast.success("Success Notification !", {
-            position: toast.POSITION.TOP_CENTER,
-        });
+        if (!toast.isActive(toastId.current as Id)) {
+            toastId.current = toast.success("Success", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                containerId: props._id,
+            }) as Id;
+        }
     };
     const handleComment = (e: FormEvent) => {
         e.preventDefault();
@@ -78,32 +81,9 @@ function PostItem(props: Props) {
         const content = comment_input.value;
         const username = userState.user.username;
         const _id = props._id as string;
-        notify();
+
         dispatch(PostThunk.comment()({ username, _id, content }));
         comment_input.value = "";
-    };
-
-    const handleViewComment = () => {
-        const access_token = Cookies.get("access_token");
-        const result = fetch(process.env.REACT_APP_URL + "/post/get-comment", {
-            method: "post",
-            headers: {
-                Authorization: "Bearer " + access_token,
-                "content-type": "application/json",
-            },
-            body: JSON.stringify({ post_id: props._id }),
-        });
-        result
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                setComments((prev) => data.comments);
-                setIsOpen((prev) => true);
-            })
-            .catch((e) => {
-                console.log(e);
-            });
     };
 
     return (
@@ -180,7 +160,9 @@ function PostItem(props: Props) {
                 </div>
 
                 <div
-                    onClick={handleViewComment}
+                    onClick={() => {
+                        setIsOpen((prev) => true);
+                    }}
                     className={cls("view_comment")}
                 >
                     View all comment
@@ -189,9 +171,9 @@ function PostItem(props: Props) {
                 {isOpen && (
                     <Comment
                         images={props.images}
-                        comments={comments}
                         isOpen={isOpen}
                         setIsOpen={setIsOpen}
+                        post_id={props._id}
                     />
                 )}
 
@@ -216,14 +198,16 @@ function PostItem(props: Props) {
                     autoComplete="off"
                 />
                 <button
-                    id="post"
+                    id={"post" + props._id}
                     className={cls("post")}
                     style={{
                         color: "rgba(0, 0, 255, 0.8)",
                     }}
+                    onClick={notify}
                 >
                     Post
                 </button>
+                <ToastContainer containerId={props._id} enableMultiContainer />
             </form>
         </div>
     );

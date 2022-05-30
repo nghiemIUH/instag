@@ -1,4 +1,4 @@
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, memo } from "react";
 import classNames from "classnames/bind";
 import style from "./Login.module.scss";
 import { Link, useNavigate } from "react-router-dom";
@@ -74,4 +74,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default memo(Login);
