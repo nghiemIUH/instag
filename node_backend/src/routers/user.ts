@@ -6,5 +6,5 @@ userRouter.post("/login", UserController.login);
 userRouter.post("/register", UserController.register);
 userRouter.post("/get-new-token", UserController.getNewAccessToken);
 userRouter.post("/get-user-reload", UserController.getUserInfo);
-
+userRouter.get("/search", UserController.search);
 export default userRouter;

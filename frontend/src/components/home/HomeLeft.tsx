@@ -14,6 +14,7 @@ function HomeLeft() {
 
     useEffect(() => {
         dispatch(PostThunk.getAllPost()());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

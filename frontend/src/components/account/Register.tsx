@@ -31,6 +31,7 @@ function Register() {
         fullName: "",
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [error, setError] = useState({
         username: "",
         password: "",
@@ -50,6 +51,7 @@ function Register() {
         }
     }, [redirect, userState.isRegister]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleValidate = () => {
         if (data.username.length < 6) {
             setError((prev) => {

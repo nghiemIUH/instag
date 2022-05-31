@@ -10,13 +10,14 @@ interface User {
 }
 
 const userSchema = new Schema<User>({
-    username: String,
+    username: { type: String },
     password: String,
     email: String,
     avatar: String,
-    fullName: String,
+    fullName: { type: String },
 });
 
+userSchema.index({ username: "text", fullName: "text" });
 const UserModel = model<User>("User", userSchema);
 
 export { User, UserModel };

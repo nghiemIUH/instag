@@ -98,6 +98,28 @@ class UserController {
             response.status(404).send({ result: "token error" });
         }
     }
+
+    async search(request: Request, response: Response) {
+        const search = request.query.search as string;
+
+        const user = await UserModel.find({
+            $or: [
+                {
+                    username: {
+                        $regex: search,
+                        $options: "i",
+                    },
+                },
+                {
+                    fullName: {
+                        $regex: search,
+                        $options: "i",
+                    },
+                },
+            ],
+        }).select("username avatar fullName");
+        return response.status(200).send(user);
+    }
 }
 
 export default new UserController();
