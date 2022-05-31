@@ -1,4 +1,4 @@
-import { useEffect, memo } from "react";
+import { useEffect } from "react";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/header/Header";
@@ -16,11 +16,12 @@ function App() {
 
     useEffect(() => {
         dispatch(getUserReload_thunk(refresh_token || ""));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <div className="App">
-            {userState.isLogin && <Header />}
+            <Header />
             <Routes>
                 <Route
                     path="/"
@@ -52,4 +53,4 @@ const PrivateRoute = ({ Component, logits, redirect }: any) => {
     return logits ? Component : <Navigate to={redirect} />;
 };
 
-export default memo(App);
+export default App;

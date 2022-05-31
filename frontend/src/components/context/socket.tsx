@@ -18,10 +18,10 @@ export const SocketProvider = ({ children }: Props) => {
     const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        console.log("render");
-        if (!socket) {
+        if (!socket?.connected) {
             connect();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const connect = () => {
@@ -29,16 +29,12 @@ export const SocketProvider = ({ children }: Props) => {
         const s = io(process.env.REACT_APP_URL as string, {
             query: { access_token },
         });
-        s.on("connect", () => {
-            console.log("connect");
-        });
+        s.on("connect", () => {});
         setSocket(s);
     };
 
     const disconnect = () => {
-        socket?.on("disconnect", () => {
-            console.log("disconnect");
-        });
+        socket?.disconnect();
     };
 
     const contextData = {

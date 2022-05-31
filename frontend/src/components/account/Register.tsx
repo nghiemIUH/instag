@@ -4,11 +4,42 @@ import style from "./Register.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { register_thunk } from "../../redux/user/thunk";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
+import {
+    RiKeyFill,
+    RiShieldUserFill,
+    RiAccountCircleFill,
+} from "react-icons/ri";
+import { MdEmail } from "react-icons/md";
+import { BiImageAdd } from "react-icons/bi";
+
+interface UserData {
+    username: string;
+    password: string;
+    email: string;
+    avatar?: File | null;
+    fullName: string;
+}
 
 const cls = classNames.bind(style);
 function Register() {
-    const [avatar, setAvatar] = useState<File>();
+    const [data, setData] = useState<UserData>({
+        username: "",
+        password: "",
+        email: "",
+        avatar: null,
+        fullName: "",
+    });
+
+    const [error, setError] = useState({
+        username: "",
+        password: "",
+        password_cf: "",
+        email: "",
+        avatar: "",
+        fullName: "",
+    });
+
     const dispatch = useAppDispatch();
     const redirect = useNavigate();
     const userState = useAppSelector((state) => state.user);
@@ -19,65 +50,182 @@ function Register() {
         }
     }, [redirect, userState.isRegister]);
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const fileList = e.target.files;
-        if (!fileList) return;
-        setAvatar(fileList[0]);
+    const handleValidate = () => {
+        if (data.username.length < 6) {
+            setError((prev) => {
+                return { ...prev, username: "Username must be > 6 character" };
+            });
+        } else {
+            setError((prev) => {
+                return { ...prev, username: "" };
+            });
+        }
+
+        if (data.password.length < 6) {
+            setError((prev) => {
+                return { ...prev, password: "Password must be > 6 character" };
+            });
+        } else {
+            setError((prev) => {
+                return { ...prev, password: "" };
+            });
+        }
+
+        const password_cf = document.getElementById(
+            "password_cf"
+        ) as HTMLInputElement;
+
+        if (data.password !== password_cf.value) {
+            setError((prev) => {
+                return {
+                    ...prev,
+                    password_cf: "Password and password confirm not correct",
+                };
+            });
+        } else {
+            setError((prev) => {
+                return { ...prev, password_cf: "" };
+            });
+        }
+
+        if (data.fullName.length === 0) {
+            setError((prev) => {
+                return {
+                    ...prev,
+                    fullName: "Full name not empty",
+                };
+            });
+        } else {
+            setError((prev) => {
+                return { ...prev, fullName: "" };
+            });
+        }
+
+        if (!data.avatar) {
+            setError((prev) => {
+                return {
+                    ...prev,
+                    avatar: "Avatars not empty",
+                };
+            });
+        } else {
+            setError((prev) => {
+                return { ...prev, avatar: "" };
+            });
+        }
+
+        if (data.email.length === 0) {
+            setError((prev) => {
+                return {
+                    ...prev,
+                    email: "Email not empty",
+                };
+            });
+        } else {
+            setError((prev) => {
+                return { ...prev, email: "" };
+            });
+        }
     };
 
     const handleClick = () => {
-        const username = document.getElementById(
-            "username"
-        ) as HTMLInputElement;
-        const password = document.getElementById(
-            "password"
-        ) as HTMLInputElement;
-        // const password_cf = document.getElementById("password_cf");
-        const email = document.getElementById("email") as HTMLInputElement;
-        const fullName = document.getElementById(
-            "fullName"
-        ) as HTMLInputElement;
-
         const formData = new FormData();
-        formData.append("username", username.value);
-        formData.append("password", password.value);
-        formData.append("email", email.value);
-        formData.append("fullName", fullName.value);
-        formData.append("avatar", avatar as File, avatar?.name);
+        formData.append("username", data.username);
+        formData.append("password", data.password);
+        formData.append("email", data.email);
+        formData.append("fullName", data.fullName);
+        formData.append("avatar", data.avatar as File, data.avatar?.name);
 
         dispatch(register_thunk(formData));
     };
     return (
         <div className={cls("register")}>
-            <img src="personal.png" alt="" />
             <div className={cls("group")}>
-                <label htmlFor="">Username</label>
-                <input type="text" id="username" />
+                <label htmlFor="">
+                    <RiShieldUserFill />
+                </label>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Username"
+                    onChange={(e) => {
+                        setData((prev) => {
+                            return { ...prev, username: e.target.value };
+                        });
+                    }}
+                />
             </div>
             <div className={cls("group")}>
-                <label htmlFor="">Password</label>
-                <input type="password" id="password" />
+                <label htmlFor="">
+                    <RiKeyFill />
+                </label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password"
+                    onChange={(e) => {
+                        setData((prev) => {
+                            return { ...prev, password: e.target.value };
+                        });
+                    }}
+                />
             </div>
             <div className={cls("group")}>
-                <label htmlFor="">Password confirm</label>
-                <input type="password" id="password_cf" />
+                <label htmlFor="">
+                    <RiKeyFill />
+                </label>
+                <input
+                    type="password"
+                    id="password_cf"
+                    placeholder="Password"
+                />
             </div>
 
             <div className={cls("group")}>
-                <label htmlFor="">Email</label>
-                <input type="email" id="email" />
+                <label htmlFor="">
+                    <MdEmail />
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email"
+                    onChange={(e) => {
+                        setData((prev) => {
+                            return { ...prev, email: e.target.value };
+                        });
+                    }}
+                />
             </div>
             <div className={cls("group")}>
-                <label htmlFor="">Full name</label>
-                <input type="text" id="fullName" />
+                <label htmlFor="">
+                    <RiAccountCircleFill />
+                </label>
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Full name"
+                    onChange={(e) => {
+                        setData((prev) => {
+                            return { ...prev, fullName: e.target.value };
+                        });
+                    }}
+                />
             </div>
             <div className={cls("group")}>
-                <label htmlFor="">Avatar</label>
+                <label htmlFor="">
+                    <BiImageAdd />
+                </label>
                 <input
                     type="file"
                     id="avatar"
                     accept=".gif,.jpg,.jpeg,.png"
-                    onChange={(e) => handleFileChange(e)}
+                    onChange={(e) => {
+                        const fileList = e.target.files;
+                        if (!fileList) return;
+                        setData((prev) => {
+                            return { ...prev, avatar: fileList[0] };
+                        });
+                    }}
                 />
             </div>
             <div className={cls("redirect")}>

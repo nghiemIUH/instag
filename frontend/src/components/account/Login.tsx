@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { login_thunk } from "../../redux/user/thunk";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { changeRegister } from "../../redux/user/userSlice";
+import { RiKeyFill, RiShieldUserFill } from "react-icons/ri";
 
 const cls = classNames.bind(style);
 
@@ -33,7 +34,6 @@ function Login() {
 
     return (
         <div className={cls("login")}>
-            <img src="key-chain.png" alt="" />
             {userState.error ? (
                 <div className={cls("error")}>
                     Username or password not invalid
@@ -48,20 +48,24 @@ function Login() {
                 onSubmit={(e) => handleLogin(e)}
             >
                 <div className={cls("group")}>
+                    <label>
+                        <RiShieldUserFill />
+                    </label>
                     <input
                         type="text"
                         onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Username"
                     />
-                    <label>Username</label>
-                    <span className={cls("bar")}></span>
                 </div>
                 <div className={cls("group")}>
+                    <label>
+                        <RiKeyFill />
+                    </label>
                     <input
                         type="password"
                         onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
                     />
-                    <span className={cls("bar")}></span>
-                    <label>Password</label>
                 </div>
                 <div className={cls("redirect")}>
                     <Link to="/">Forgot Password</Link>

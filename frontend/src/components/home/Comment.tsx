@@ -1,4 +1,11 @@
-import { FormEvent, memo, useEffect, useState, useContext } from "react";
+import {
+    FormEvent,
+    memo,
+    useEffect,
+    useState,
+    useContext,
+    useRef,
+} from "react";
 import classNames from "classnames/bind";
 import style from "./Comment.module.scss";
 import Slider from "react-slick";
@@ -12,10 +19,15 @@ const cls = classNames.bind(style);
 
 function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
     const { socket } = useContext(SocketContext) as SocketContextType;
-    console.log(socket);
 
     const [comments, setComments] = useState<Array<CommentType>>([]);
     const user = useAppSelector((state) => state.user);
+    const comment_ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        comment_ref.current?.scrollTo(0, comment_ref.current.scrollHeight);
+    }, [comments]);
+
     useEffect(() => {
         const access_token = Cookies.get("access_token");
         const result = fetch(process.env.REACT_APP_URL + "/post/get-comment", {
@@ -34,16 +46,15 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
                 setComments(data.comments);
             })
             .catch((e) => {});
-    }, []);
+    }, [post_id]);
 
     useEffect(() => {
         socket?.on(post_id as string, (data) => {
-            console.log(data);
             setComments((prev) => {
                 return [...prev, data];
             });
         });
-    }, []);
+    }, [post_id, socket]);
 
     const handleSubmitComment = (e: FormEvent) => {
         e.preventDefault();
@@ -102,7 +113,7 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
                             </Slider>
                         </div>
                         <div className={cls("list_cmt")}>
-                            <div className={cls("cmt_top")}>
+                            <div className={cls("cmt_top")} ref={comment_ref}>
                                 {comments?.map((value, index) => {
                                     return (
                                         <div

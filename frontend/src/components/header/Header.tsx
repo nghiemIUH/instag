@@ -88,28 +88,30 @@ function Header() {
                 />
             </div>
 
-            <div className={cls("avatar")}>
-                <img
-                    src={
-                        process.env.REACT_APP_URL +
-                        "/static/avatars/" +
-                        userState.user.avatar
-                    }
-                    alt=""
-                />
-                <div className={cls("sub_menu")}>
-                    <div>
+            {userState.isLogin && (
+                <div className={cls("avatar")}>
+                    <img
+                        src={
+                            process.env.REACT_APP_URL +
+                            "/static/avatars/" +
+                            userState.user.avatar
+                        }
+                        alt=""
+                    />
+                    <div className={cls("sub_menu")}>
                         <div>
-                            <CgProfile /> Profile
+                            <div>
+                                <CgProfile /> Profile
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div onClick={handleLogOut}>
-                            <AiOutlineLogout /> Logout
+                        <div>
+                            <div onClick={handleLogOut}>
+                                <AiOutlineLogout /> Logout
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
