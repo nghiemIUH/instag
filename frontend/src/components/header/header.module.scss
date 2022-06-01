@@ -8,7 +8,7 @@
     padding: 5px 0;
     position: fixed;
     top: 0;
-    z-index: 10;
+    z-index: 2;
 
     .logo {
         font-size: 2rem;
@@ -97,45 +97,34 @@
     }
 
     .avatar {
-        position: relative;
+        display: flex;
+        align-items: center;
         img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            margin-right: 10px;
         }
-        .sub_menu {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            min-width: 120px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            left: -30px;
-            padding: 10px;
-            border-radius: 5px;
 
-            div {
-                padding: 5px;
-                border-radius: 4px;
-                cursor: pointer;
-
-                div {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    color: #000;
-                    text-decoration: none;
-                }
-                svg {
-                    font-size: 1.5rem;
-                }
-                &:hover {
-                    background-color: rgba(0, 0, 0, 0.2);
-                }
-            }
-        }
         &:hover .sub_menu {
-            display: block;
+            visibility: visible;
+            animation-name: hoverexpandSubmenu;
+            animation-duration: 0.5s;
         }
+        .logout {
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-shadow: 1px 1px 1px Indigo;
+        }
+    }
+}
+
+@keyframes hoverexpandSubmenu {
+    from {
+        height: 25px;
+    }
+    to {
+        height: 100px;
     }
 }

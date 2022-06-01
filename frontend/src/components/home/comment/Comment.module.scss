@@ -1,23 +1,7 @@
-.wrapper {
-    display: flex;
-    font-weight: 550;
-    cursor: pointer;
-    font-size: 0.8rem;
-
-    a {
-        display: inline-block;
-        text-decoration: none;
-        background-color: #fff;
-        border-radius: 3px;
-        color: gray;
-        font-family: "Roboto", sans-serif;
-    }
-}
-
 .modal {
     visibility: hidden;
     opacity: 0;
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
@@ -27,8 +11,9 @@
     justify-content: center;
     background: rgba(77, 77, 77, 0.7);
     transition: all 0.4s;
-    z-index: 2;
-    margin-top: 10vh;
+    z-index: 3;
+    width: 100vw;
+    height: 100vh;
 
     .modal__content {
         border-radius: 4px;

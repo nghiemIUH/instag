@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
-import { SocketProvider } from "./components/context/socket";
+import { SocketProvider } from "./context/socket";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement

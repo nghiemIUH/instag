@@ -12,8 +12,8 @@ import Slider from "react-slick";
 import "./Comment.css";
 import { Socket } from "socket.io-client";
 import Cookies from "js-cookie";
-import { useAppSelector } from "../../redux/hooks";
-import SocketContext from "../context/socket";
+import { useAppSelector } from "../../../redux/hooks";
+import SocketContext from "../../../context/socket";
 
 const cls = classNames.bind(style);
 
@@ -76,10 +76,8 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
 
     return (
         <div>
-            <div className={cls("wrapper")}></div>
-
             <div
-                id="demo-modal"
+                id="modal"
                 className={cls("modal")}
                 style={isOpen ? { visibility: "visible", opacity: 1 } : {}}
             >

@@ -2,9 +2,9 @@ import { FormEvent, useState, useEffect, memo } from "react";
 import classNames from "classnames/bind";
 import style from "./Login.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { login_thunk } from "../../redux/user/thunk";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { changeRegister } from "../../redux/user/userSlice";
+import { login_thunk } from "../../../redux/user/thunk";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { changeRegister } from "../../../redux/user/userSlice";
 import { RiKeyFill, RiShieldUserFill } from "react-icons/ri";
 
 const cls = classNames.bind(style);

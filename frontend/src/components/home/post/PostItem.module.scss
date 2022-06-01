@@ -1,5 +1,4 @@
 .post_item {
-    margin: 20px 0;
     border: 1px solid rgba($color: #000000, $alpha: 0.2);
     background-color: #fff;
 
@@ -68,9 +67,10 @@
     .comment {
         display: flex;
         width: 100%;
-        padding: 10px 5px;
+        padding: 10px 0;
         border: 1px solid rgba($color: #000000, $alpha: 0.2);
         border-bottom: none;
+        border-right: 0;
 
         .select_icon {
             width: 5%;
@@ -94,4 +94,8 @@
             cursor: pointer;
         }
     }
+}
+
+.post_item:not(:first-child) {
+    margin: 20px 0;
 }

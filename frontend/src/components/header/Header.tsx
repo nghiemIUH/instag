@@ -5,11 +5,8 @@ import {
     AiOutlineHome,
     AiOutlineMessage,
     AiOutlineCompass,
-    AiOutlineHeart,
-    AiOutlineLogout,
 } from "react-icons/ai";
 import { BiMessageAltAdd } from "react-icons/bi";
-import { CgProfile } from "react-icons/cg";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { logout } from "../../redux/user/userSlice";
 import { getNewToken_thunk } from "../../redux/user/thunk";
@@ -156,7 +153,7 @@ function Header() {
                             })
                         ) : (
                             <div className={cls("search_not_found")}>
-                                Khong tim thay
+                                Not found
                             </div>
                         )}
                     </div>
@@ -183,10 +180,6 @@ function Header() {
                     }}
                     onClick={() => setSelectMenu("compass")}
                 />
-                <AiOutlineHeart
-                    style={{ color: selectMenu === "heart" ? "red" : "black" }}
-                    onClick={() => setSelectMenu("heart")}
-                />
             </div>
 
             {userState.isLogin && (
@@ -199,17 +192,8 @@ function Header() {
                         }
                         alt=""
                     />
-                    <div className={cls("sub_menu")}>
-                        <div>
-                            <div>
-                                <CgProfile /> Profile
-                            </div>
-                        </div>
-                        <div>
-                            <div onClick={handleLogOut}>
-                                <AiOutlineLogout /> Logout
-                            </div>
-                        </div>
+                    <div className={cls("logout")} onClick={handleLogOut}>
+                        Logout
                     </div>
                 </div>
             )}

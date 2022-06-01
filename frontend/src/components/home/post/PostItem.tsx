@@ -7,9 +7,10 @@ import { FiSend } from "react-icons/fi";
 import { BsBookmark } from "react-icons/bs";
 import { EmojiButton } from "@joeattardi/emoji-button";
 import Slider from "react-slick";
-import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import PostThunk from "../../redux/post/thunk";
-import Comment from "./Comment";
+import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
+import PostThunk from "../../../redux/post/thunk";
+import Comment from "../comment/Comment";
+
 import { toast, ToastContainer, Id } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -63,7 +64,7 @@ function PostItem(props: Props) {
         if (!toast.isActive(toastId.current as Id)) {
             toastId.current = toast.success("Success", {
                 position: "top-right",
-                autoClose: 5000,
+                autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -103,7 +104,6 @@ function PostItem(props: Props) {
                         {props.userName}
                     </div>
                 </div>
-                <div className={cls("more")}>...</div>
             </div>
             {/* content */}
             <div className={cls("post_content")}>

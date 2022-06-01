@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import classNames from "classnames/bind";
 import style from "./Register.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { register_thunk } from "../../redux/user/thunk";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { register_thunk } from "../../../redux/user/thunk";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useState } from "react";
 import {
     RiKeyFill,
