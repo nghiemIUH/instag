@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
-import Cookies from "js-cookie";
+import { useAppSelector } from "../redux/hooks";
 
 interface SocketContextType {
     socket: Socket | null;
@@ -16,6 +16,7 @@ const SocketContext = createContext<SocketContextType | null>(null);
 
 export const SocketProvider = ({ children }: Props) => {
     const [socket, setSocket] = useState<Socket | null>(null);
+    const userState = useAppSelector((state) => state.user);
 
     useEffect(() => {
         if (!socket?.connected) {
@@ -25,9 +26,8 @@ export const SocketProvider = ({ children }: Props) => {
     }, []);
 
     const connect = () => {
-        const access_token = Cookies.get("access_token");
         const s = io(process.env.REACT_APP_URL as string, {
-            query: { access_token },
+            query: { access_token: userState.access_token },
         });
         s.on("connect", () => {});
         setSocket(s);

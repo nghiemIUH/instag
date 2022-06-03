@@ -1,0 +1,184 @@
+@import "../../../GlobalStyle.scss";
+
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 10vh;
+
+    @include res_600 {
+        width: 350px;
+    }
+    .profile_info {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        .avatar {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user_info {
+            width: 60%;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            margin-left: 15px;
+            justify-content: space-around;
+
+            .user_info_row_1 {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                font-size: 28px;
+                font-weight: 300;
+                color: rgb(38, 38, 38);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    Roboto, Helvetica, Arial, sans-serif;
+
+                button {
+                    padding: 0 10px;
+                    font-size: 12px;
+                    border: 0.5px solid lightgray;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+            }
+
+            .user_info_row_2 {
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                    font-weight: 700;
+                }
+            }
+            .user_info_row_3 {
+                display: flex;
+                justify-content: space-between;
+                font-weight: 600;
+            }
+        }
+    }
+    .break {
+        width: 120%;
+        border-top: 0.5px solid rgba($color: #000000, $alpha: 0.3);
+        margin-top: 50px;
+    }
+
+    .posts {
+        width: 120%;
+        margin-top: 20px;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(77, 77, 77, 0.7);
+        transition: all 0.4s;
+        z-index: 3;
+        width: 100vw;
+        height: 100vh;
+        animation-name: openEdit;
+        animation-duration: 0.5s;
+
+        .modal_content {
+            width: 500px;
+            height: 500px;
+            background-color: #fff;
+            position: relative;
+            border-radius: 10px;
+            .modal_close {
+                position: absolute;
+                color: #fff;
+                font-size: 2rem;
+                top: -40px;
+                right: -30px;
+                cursor: pointer;
+            }
+            .form_edit {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 10px;
+                .form_group:first-child {
+                    display: flex;
+                    flex-direction: column;
+                    margin-bottom: 50px;
+                    img {
+                        width: 100px;
+                        height: 100px;
+                        object-fit: cover;
+                        border-radius: 50%;
+                    }
+                    label {
+                        font-size: 0.8rem;
+                        padding: 5px;
+                        background-color: rgba($color: #000000, $alpha: 0.3);
+                        margin: 5px 0;
+                        text-align: center;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    }
+                }
+
+                .form_submit {
+                    width: 50%;
+                    display: flex;
+                    flex-direction: row-reverse;
+                    button {
+                        border: none;
+                        padding: 7px 15px;
+                        border-radius: 5px;
+                        background-color: #2196f3;
+                        color: #fff;
+                        font-size: 1rem;
+                        cursor: pointer;
+                    }
+                }
+
+                .form_group:not(:first-child) {
+                    margin-bottom: 10px;
+                    width: 50%;
+                    display: flex;
+                    align-items: center;
+                    border: 1px solid #2196f3;
+                    border-radius: 5px;
+
+                    label {
+                        background-color: #2196f3;
+                        padding: 10px;
+                    }
+
+                    input {
+                        border: none;
+                        padding: 10px 5px;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes openEdit {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

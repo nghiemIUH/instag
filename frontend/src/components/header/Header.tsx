@@ -9,7 +9,8 @@ import {
 import { BiMessageAltAdd } from "react-icons/bi";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { logout } from "../../redux/user/userSlice";
-import { getNewToken_thunk } from "../../redux/user/thunk";
+import { Link } from "react-router-dom";
+import UserThunk from "../../redux/user/thunk";
 import Cookies from "js-cookie";
 import style from "./header.module.scss";
 import UploadPost from "./UploadPost";
@@ -42,10 +43,11 @@ function Header() {
 
     useEffect(() => {
         const refresh_token = Cookies.get("refresh_token") as string;
+
         const minute = 1000 * 60 * 1;
         const interval = setInterval(() => {
             if (userState.isLogin) {
-                dispatch(getNewToken_thunk(refresh_token || ""));
+                dispatch(UserThunk.getNewToken()(refresh_token || ""));
             }
         }, minute);
         return () => clearInterval(interval);
@@ -161,10 +163,14 @@ function Header() {
             </div>
 
             <div className={cls("menu")}>
-                <AiOutlineHome
-                    style={{ color: selectMenu === "home" ? "red" : "black" }}
-                    onClick={() => setSelectMenu("home")}
-                />
+                <Link to="/">
+                    <AiOutlineHome
+                        style={{
+                            color: selectMenu === "home" ? "red" : "black",
+                        }}
+                        onClick={() => setSelectMenu("home")}
+                    />
+                </Link>
                 <AiOutlineMessage
                     style={{ color: selectMenu === "mess" ? "red" : "black" }}
                     onClick={() => setSelectMenu("mess")}
@@ -192,8 +198,11 @@ function Header() {
                         }
                         alt=""
                     />
-                    <div className={cls("logout")} onClick={handleLogOut}>
-                        Logout
+                    <div className={cls("sub_menu")}>
+                        <Link to="/profile">Profile</Link>
+                        <Link to="/login" onClick={handleLogOut}>
+                            Logout
+                        </Link>
                     </div>
                 </div>
             )}

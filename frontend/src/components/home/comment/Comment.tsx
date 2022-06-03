@@ -11,7 +11,6 @@ import style from "./Comment.module.scss";
 import Slider from "react-slick";
 import "./Comment.css";
 import { Socket } from "socket.io-client";
-import Cookies from "js-cookie";
 import { useAppSelector } from "../../../redux/hooks";
 import SocketContext from "../../../context/socket";
 
@@ -21,7 +20,7 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
     const { socket } = useContext(SocketContext) as SocketContextType;
 
     const [comments, setComments] = useState<Array<CommentType>>([]);
-    const user = useAppSelector((state) => state.user);
+    const userState = useAppSelector((state) => state.user);
     const comment_ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -29,11 +28,10 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
     }, [comments]);
 
     useEffect(() => {
-        const access_token = Cookies.get("access_token");
         const result = fetch(process.env.REACT_APP_URL + "/post/get-comment", {
             method: "post",
             headers: {
-                Authorization: "Bearer " + access_token,
+                Authorization: "Bearer " + userState.access_token,
                 "content-type": "application/json",
             },
             body: JSON.stringify({ post_id }),
@@ -46,7 +44,7 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
                 setComments(data.comments);
             })
             .catch((e) => {});
-    }, [post_id]);
+    }, [post_id, userState.access_token]);
 
     useEffect(() => {
         socket?.on(post_id as string, (data) => {
@@ -66,8 +64,8 @@ function Comment({ images, isOpen, setIsOpen, post_id }: Props) {
             content: comment_input.value,
             post_id: post_id,
             author: {
-                avatar: user.user.avatar,
-                username: user.user.username,
+                avatar: userState.user.avatar,
+                username: userState.user.username,
             },
             date: new Date(),
         });

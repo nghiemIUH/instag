@@ -6,116 +6,116 @@
     position: relative;
     justify-content: center;
 
-    .home_left {
-        height: 100%;
-        max-width: 40%;
+    .open_menu {
+        position: fixed;
+        z-index: 2;
+        left: 20px;
+        cursor: pointer;
+        font-size: 1.5rem;
+        visibility: visible;
+        z-index: 0;
+        padding: 5px;
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+            rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+            rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
 
-        &::-webkit-scrollbar {
-            display: none;
-        }
-        .open_menu {
-            position: fixed;
-            z-index: 2;
-            left: 20px;
-            cursor: pointer;
+    .profile {
+        display: flex;
+        justify-content: center;
+        position: fixed;
+        transition: 0.5s;
+        z-index: 2;
+        left: 0;
+        top: 8vh;
+        height: 100vh;
+        border: 0.5px solid lightgray;
+        border-top: none;
+        // border-radius: 0 15px 15px 0;
+        width: 0;
+        overflow: hidden;
+        .close_btn {
+            position: absolute;
+            right: 3px;
+            top: -10px;
             font-size: 1.5rem;
+            cursor: pointer;
             visibility: visible;
-            z-index: 0;
-            padding: 5px;
-            width: 30px;
-            height: 30px;
-            border-radius: 5px;
+        }
+        .menu_profile {
+            width: 100%;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+                rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+            background-color: #fff;
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
-                rgba(0, 0, 0, 0.12) 0px -12px 30px,
-                rgba(0, 0, 0, 0.12) 0px 4px 6px,
-                rgba(0, 0, 0, 0.17) 0px 12px 13px,
-                rgba(0, 0, 0, 0.09) 0px -3px 5px;
-        }
-        .profile {
-            display: flex;
-            justify-content: center;
-            position: fixed;
-            transition: 0.5s;
-            z-index: 2;
-            left: 0;
-            top: 8vh;
-            height: 100vh;
-            border: 0.5px solid lightgray;
-            border-top: none;
-            // border-radius: 0 15px 15px 0;
-            width: 0;
-            overflow: hidden;
-            .close_btn {
-                position: absolute;
-                right: 3px;
-                top: -10px;
-                font-size: 1.5rem;
-                cursor: pointer;
-                visibility: visible;
-            }
-            .menu_profile {
-                width: 100%;
-                box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-                    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
-                background-color: #fff;
+            flex-direction: column;
+
+            .profile_some_info {
                 display: flex;
                 align-items: center;
                 flex-direction: column;
+                margin-top: 5%;
 
-                .profile_some_info {
+                img {
+                    width: 6vw;
+                    height: 6vw;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+                div {
+                    font-weight: 600;
+                    margin-top: 10px;
+                }
+            }
+
+            .menu_button {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                .btn_group:first-child {
+                    margin-top: 50px;
+                }
+
+                .btn_group {
+                    width: 90%;
                     display: flex;
                     align-items: center;
-                    flex-direction: column;
-                    margin-top: 5%;
+                    margin-bottom: 5px;
+                    cursor: pointer;
+                    padding: 10px 5px;
+                    border-radius: 5px;
 
-                    img {
-                        width: 6vw;
-                        height: 6vw;
-                        border-radius: 50%;
-                        object-fit: cover;
+                    svg {
+                        font-size: 1.5rem;
                     }
+
                     div {
-                        font-weight: 600;
-                        margin-top: 10px;
-                    }
-                }
-
-                .menu_button {
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-
-                    .btn_group:first-child {
-                        margin-top: 50px;
-                    }
-
-                    .btn_group {
-                        width: 90%;
-                        display: flex;
-                        align-items: center;
-                        margin-bottom: 5px;
-                        cursor: pointer;
-                        padding: 10px 5px;
-                        border-radius: 5px;
-
-                        svg {
-                            font-size: 1.5rem;
-                        }
-
-                        div {
-                            margin-left: 20px;
-                            font-weight: 500;
-                        }
+                        margin-left: 20px;
+                        font-weight: 500;
                     }
                 }
             }
-            .info {
-                width: 40vw;
-            }
+        }
+        .info {
+            width: 40vw;
+        }
+    }
+
+    .home_left {
+        height: 100%;
+        max-width: 40vw;
+
+        &::-webkit-scrollbar {
+            display: none;
         }
     }
 

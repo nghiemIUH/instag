@@ -77,6 +77,16 @@ class Post {
             .select("comments");
         return response.status(200).send({ comments: post_comment?.comments });
     }
+
+    async getPostUserID(request: Request, response: Response) {
+        const { user_id } = request.body;
+        const user = await UserModel.findById(user_id);
+        const posts = await PostModel.find({ author: user }).populate({
+            path: "author",
+            select: "avatar username",
+        });
+        return response.status(200).send({ posts });
+    }
 }
 
 export default new Post();

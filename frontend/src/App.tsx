@@ -1,56 +1,55 @@
 import { useEffect } from "react";
 import "./App.css";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
 import Login from "./components/account/login/Login";
 import Register from "./components/account/register/Register";
 import { useAppSelector, useAppDispatch } from "./redux/hooks";
-import { getUserReload_thunk } from "./redux/user/thunk";
+import UserThunk from "./redux/user/thunk";
+import Profile from "./components/account/profile/Profile";
 import Cookies from "js-cookie";
-
 function App() {
     const userState = useAppSelector((state) => state.user);
     const dispatch = useAppDispatch();
-    const refresh_token = Cookies.get("refresh_token");
 
     useEffect(() => {
-        dispatch(getUserReload_thunk(refresh_token || ""));
+        const refresh_token = Cookies.get("refresh_token");
+        dispatch(UserThunk.getUserReload()(refresh_token || ""));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
     return (
         <div className="App">
-            <Header />
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        <PrivateRoute
-                            Component={<Home />}
-                            logits={userState.isLogin}
-                            redirect="/login"
-                        />
-                    }
-                />
-                <Route path="/login" element={<Login />} />
-                <Route
-                    path="/register"
-                    element={
-                        <PrivateRoute
-                            Component={<Register />}
-                            logits={!userState.isLogin}
-                            redirect="/"
-                        />
-                    }
-                />
-            </Routes>
+            {userState.isLoading ? (
+                <div>Loading...</div>
+            ) : (
+                <>
+                    <Header />
+                    <Routes>
+                        <Route
+                            element={
+                                <PrivateRoutes isLogin={userState.isLogin} />
+                            }
+                        >
+                            <Route path="/" element={<Home />} />
+                            <Route path="/profile" element={<Profile />} />
+                        </Route>
+
+                        <Route element={<Login />} path="/login" />
+                        <Route element={<Register />} path="/register" />
+                    </Routes>
+                </>
+            )}
         </div>
     );
 }
 
-const PrivateRoute = ({ Component, logits, redirect }: any) => {
-    return logits ? Component : <Navigate to={redirect} />;
+interface PrivateRouteType {
+    isLogin: boolean;
+}
+
+const PrivateRoutes = ({ isLogin }: PrivateRouteType) => {
+    return isLogin ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default App;

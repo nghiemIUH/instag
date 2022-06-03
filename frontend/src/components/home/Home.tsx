@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useState } from "react";
+import { memo, useContext, useEffect } from "react";
 import classNames from "classnames/bind";
 import style from "./Home.module.scss";
 import { Socket } from "socket.io-client";
@@ -8,11 +8,6 @@ import PostItem from "./post/PostItem";
 import Story from "./story/Story";
 import { useAppDispatch, useAppSelector } from "./../../redux/hooks";
 import PostThunk from "./../../redux/post/thunk";
-import { ImProfile } from "react-icons/im";
-import { RiUserFollowLine } from "react-icons/ri";
-import { GrArticle } from "react-icons/gr";
-import { MdOutlineAnalytics } from "react-icons/md";
-import { CgMenuGridO } from "react-icons/cg";
 
 // =========
 const cls = classNames.bind(style);
@@ -24,125 +19,31 @@ interface SocketContextType {
 }
 
 function Home() {
-    const { socket, connect, disconnect } = useContext(
-        SocketContext
-    ) as SocketContextType;
+    const { socket, connect } = useContext(SocketContext) as SocketContextType;
     useEffect(() => {
         if (!socket) {
             connect();
         }
         if (!socket?.connected) {
-            disconnect();
             connect();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const userState = useAppSelector((state) => state.user);
     const postState = useAppSelector((state) => state.post);
-    const [selectMenu, setSelectMenu] = useState("post");
+    const userState = useAppSelector((state) => state.user);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(PostThunk.getAllPost()());
+        dispatch(
+            PostThunk.getAllPost()({ access_token: userState.access_token })
+        );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <div className={cls("home")}>
             <div className={cls("home_left")}>
-                <div className={cls("profile")} id="profile">
-                    <div className={cls("menu_profile")}>
-                        <div
-                            className={cls("close_btn")}
-                            onClick={() => {
-                                (
-                                    document.getElementById(
-                                        "profile"
-                                    ) as HTMLElement
-                                ).style.setProperty("width", "0", "important");
-                            }}
-                        >
-                            &times;
-                        </div>
-                        <div className={cls("profile_some_info")}>
-                            <img
-                                src={
-                                    process.env.REACT_APP_URL +
-                                    "/static/avatars/" +
-                                    userState.user.avatar
-                                }
-                                alt=""
-                            />
-                            <div>{userState.user.fullName}</div>
-                        </div>
-
-                        <div className={cls("menu_button")}>
-                            <div
-                                className={cls("btn_group")}
-                                style={{
-                                    backgroundColor:
-                                        selectMenu === "post"
-                                            ? "#cee5fc"
-                                            : "#fff",
-                                }}
-                                onClick={() => setSelectMenu("post")}
-                            >
-                                <GrArticle />
-                                <div>Post</div>
-                            </div>
-                            <div
-                                className={cls("btn_group")}
-                                style={{
-                                    backgroundColor:
-                                        selectMenu === "profile"
-                                            ? "#cee5fc"
-                                            : "#fff",
-                                }}
-                                onClick={() => setSelectMenu("profile")}
-                            >
-                                <ImProfile />
-                                <div>Profile</div>
-                            </div>
-                            <div
-                                className={cls("btn_group")}
-                                style={{
-                                    backgroundColor:
-                                        selectMenu === "followed"
-                                            ? "#cee5fc"
-                                            : "#fff",
-                                }}
-                                onClick={() => setSelectMenu("followed")}
-                            >
-                                <RiUserFollowLine />
-                                <div>Followed</div>
-                            </div>
-                            <div
-                                className={cls("btn_group")}
-                                style={{
-                                    backgroundColor:
-                                        selectMenu === "analysis"
-                                            ? "#cee5fc"
-                                            : "#fff",
-                                }}
-                                onClick={() => setSelectMenu("analysis")}
-                            >
-                                <MdOutlineAnalytics />
-                                <div>Analysis</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    className={cls("open_menu")}
-                    onClick={() => {
-                        (
-                            document.getElementById("profile") as HTMLElement
-                        ).style.setProperty("width", "20vw", "important");
-                    }}
-                >
-                    <CgMenuGridO />
-                </div>
                 <Story />
                 {postState.post.map((value, index) => {
                     return (
@@ -164,7 +65,12 @@ function Home() {
                 <div className={cls("my_info")}>
                     <img src="avatar.png" alt="" />
                     <div className={cls("info")}>
-                        <div style={{ fontSize: "0.8rem", fontWeight: "600" }}>
+                        <div
+                            style={{
+                                fontSize: "0.8rem",
+                                fontWeight: "600",
+                            }}
+                        >
                             nghiem.van.3133719
                         </div>
                         <div

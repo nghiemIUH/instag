@@ -2,7 +2,7 @@ import { FormEvent, useState, useEffect, memo } from "react";
 import classNames from "classnames/bind";
 import style from "./Login.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { login_thunk } from "../../../redux/user/thunk";
+import UserThunk from "../../../redux/user/thunk";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { changeRegister } from "../../../redux/user/userSlice";
 import { RiKeyFill, RiShieldUserFill } from "react-icons/ri";
@@ -16,7 +16,7 @@ function Login() {
     const dispatch = useAppDispatch();
     const handleLogin = (e: FormEvent) => {
         e.preventDefault();
-        dispatch(login_thunk({ username, password }));
+        dispatch(UserThunk.login()({ username, password }));
     };
 
     const userState = useAppSelector((state) => state.user);

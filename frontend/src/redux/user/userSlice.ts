@@ -1,29 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User, UserInfo } from "../../entities/user";
-import {
-    login_thunk,
-    getNewToken_thunk,
-    getUserReload_thunk,
-    register_thunk,
-} from "./thunk";
+import UserThunk from "./thunk";
 import Cookies from "js-cookie";
 
 interface UserState {
     user: UserInfo;
     access_token: string;
-    refresh_token: string;
     isLogin: boolean;
     error: boolean;
     isRegister: boolean;
+    isLoading: boolean;
 }
 
 const initialState = {
     user: {} as UserInfo,
     access_token: "",
-    refresh_token: "",
-    isLogin: false,
+    isLogin: true,
     error: false,
     isRegister: false,
+    isLoading: true,
 } as UserState;
 
 export const userSlice = createSlice({
@@ -31,19 +26,26 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         logout: (state: UserState, action: PayloadAction) => {
-            Cookies.set("access_token", "");
-            Cookies.set("refresh_token", "");
-            return initialState;
+            Cookies.remove("refresh_token");
+            return { ...initialState, isLogin: false, isLoading: false };
         },
         changeRegister: (state: UserState, action: PayloadAction) => {
             state.isRegister = false;
         },
+        renewAccessToken: (state: UserState, action: PayloadAction<any>) => {
+            state.access_token = action.payload.access_token;
+        },
     },
     extraReducers: (builder) => {
+        builder.addCase(UserThunk.login().pending, (state, action) => {
+            return {
+                ...state,
+                isLoading: true,
+            };
+        });
         builder.addCase(
-            login_thunk.fulfilled,
+            UserThunk.login().fulfilled,
             (state, action: PayloadAction<User>) => {
-                Cookies.set("access_token", action.payload.access_token);
                 Cookies.set("refresh_token", action.payload.refresh_token);
 
                 return {
@@ -51,53 +53,65 @@ export const userSlice = createSlice({
                     ...action.payload,
                     isLogin: true,
                     error: false,
+                    isLoading: false,
                 };
             }
         );
 
-        builder.addCase(login_thunk.rejected, (state, action) => {
+        builder.addCase(UserThunk.login().rejected, (state, action) => {
             state.error = true;
         });
 
-        builder.addCase(getNewToken_thunk.fulfilled, (state, action) => {
+        builder.addCase(UserThunk.getNewToken().fulfilled, (state, action) => {
             state.access_token = action.payload.access_token;
             state.isLogin = true;
-            state.error = false
-            Cookies.set("access_token", action.payload.access_token);
+            state.error = false;
         });
 
-        builder.addCase(getNewToken_thunk.rejected, (state, action) => {
-            Cookies.set("access_token", "");
+        builder.addCase(UserThunk.getNewToken().rejected, (state, action) => {
             Cookies.set("refresh_token", "");
             return initialState;
         });
 
-        builder.addCase(getUserReload_thunk.fulfilled, (state, action) => {
-            state.access_token = action.payload.access_token;
-            state.user = action.payload.user;
-            state.refresh_token = Cookies.get("refresh_token") as string;
+        builder.addCase(UserThunk.getUserReload().pending, (state, action) => {
+            state.isLoading = true;
             state.isLogin = true;
-            state.error = false
-
         });
 
-        builder.addCase(getUserReload_thunk.rejected, (state, action) => {
-            Cookies.set("access_token", "");
-            Cookies.set("refresh_token", "");
-            return initialState;
+        builder.addCase(
+            UserThunk.getUserReload().fulfilled,
+            (state, action) => {
+                state.isLogin = true;
+                state.error = false;
+                state.access_token = action.payload.access_token;
+                state.user = action.payload.user;
+                state.isLoading = false;
+            }
+        );
+
+        builder.addCase(UserThunk.getUserReload().rejected, (state, action) => {
+            return { ...initialState, isLogin: false, isLoading: false };
         });
 
-        builder.addCase(register_thunk.fulfilled, (state, action) => {
+        builder.addCase(UserThunk.register().fulfilled, (state, action) => {
             state.isRegister = true;
-            state.error = false
-
+            state.error = false;
         });
 
-        builder.addCase(register_thunk.rejected, (state, action) => {
+        builder.addCase(UserThunk.register().rejected, (state, action) => {
             state.isRegister = false;
+        });
+
+        builder.addCase(UserThunk.update().fulfilled, (state, action) => {
+            state.user = action.payload.user;
+            state.error = false;
+        });
+
+        builder.addCase(UserThunk.update().rejected, (state, action) => {
+            state.error = true;
         });
     },
 });
 
-export const { logout, changeRegister } = userSlice.actions;
+export const { logout, changeRegister, renewAccessToken } = userSlice.actions;
 export default userSlice;

@@ -1,13 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import Cookies from "js-cookie";
+
+interface DataType {
+    access_token: string;
+    _data?: any;
+}
 
 class PostThunk {
     static addPost() {
         return createAsyncThunk(
             "post/add-post",
-            async (formData: FormData, thunkAPI) => {
-                const access_token = Cookies.get("access_token");
-
+            async (data: DataType, thunkAPI) => {
+                const { _data, access_token } = data;
                 if (access_token === "") {
                     return thunkAPI.rejectWithValue("error");
                 }
@@ -16,7 +19,7 @@ class PostThunk {
                     process.env.REACT_APP_URL + "/post/add",
                     {
                         method: "post",
-                        body: formData,
+                        body: _data,
                         headers: {
                             Authorization: `Bearer ${access_token}`,
                         },
@@ -32,39 +35,38 @@ class PostThunk {
     }
 
     static getAllPost() {
-        return createAsyncThunk("post/get-all", async (state, thunkAPI) => {
-            const access_token = Cookies.get("access_token");
-            const result = await fetch(
-                process.env.REACT_APP_URL + "/post/get-all",
-                {
-                    method: "get",
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                    },
+        return createAsyncThunk(
+            "post/get-all",
+            async (data: DataType, thunkAPI) => {
+                const { access_token } = data;
+                const result = await fetch(
+                    process.env.REACT_APP_URL + "/post/get-all",
+                    {
+                        method: "get",
+                        headers: {
+                            Authorization: `Bearer ${access_token}`,
+                        },
+                    }
+                );
+                if (result.status === 200) {
+                    return result.json();
                 }
-            );
-            if (result.status === 200) {
-                return result.json();
+                return thunkAPI.rejectWithValue("error");
             }
-            return thunkAPI.rejectWithValue("error");
-        });
+        );
     }
 
     static like() {
-        interface DataPostLike {
-            username: string;
-            _id: string;
-        }
         return createAsyncThunk(
             "post/like",
-            async (data: DataPostLike, thunkAPI) => {
-                const access_token = Cookies.get("access_token");
+            async (data: DataType, thunkAPI) => {
+                const { access_token, _data } = data;
 
                 const result = await fetch(
                     process.env.REACT_APP_URL + "/post/like",
                     {
                         method: "post",
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(_data),
                         headers: {
                             Authorization: "Bearer " + access_token,
                             "content-type": "application/json",
@@ -80,14 +82,10 @@ class PostThunk {
     }
 
     static addComment() {
-        interface DataComment {
-            user_id: string;
-            content: string;
-        }
-        const access_token = Cookies.get("access_token");
         return createAsyncThunk(
             "post/add-comment",
-            async (data: DataComment, thunkAPI) => {
+            async (data: DataType, thunkAPI) => {
+                const { access_token, _data } = data;
                 const result = await fetch(
                     process.env.REACT_APP_URL + "/post/add-comment",
                     {
@@ -96,7 +94,7 @@ class PostThunk {
                             Authorization: "Bearer " + access_token,
                             "content-type": "application/json",
                         },
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(_data),
                     }
                 );
                 if (result.status === 200) {
@@ -107,15 +105,11 @@ class PostThunk {
         );
     }
     static comment() {
-        interface DataComment {
-            username: string;
-            _id: string;
-            content: string;
-        }
         return createAsyncThunk(
             "post/comment",
-            async (data: DataComment, thunkAPI) => {
-                const access_token = Cookies.get("access_token");
+            async (data: DataType, thunkAPI) => {
+                const { access_token, _data } = data;
+
                 const result = await fetch(
                     process.env.REACT_APP_URL + "/post/comment",
                     {
@@ -124,7 +118,7 @@ class PostThunk {
                             Authorization: "Bearer " + access_token,
                             "content-type": "application/json",
                         },
-                        body: JSON.stringify(data),
+                        body: JSON.stringify(_data),
                     }
                 );
                 if (result.status === 200) {

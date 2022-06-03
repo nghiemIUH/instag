@@ -1,82 +1,110 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { AxiosConfig } from "../../configs/axiosConfig";
 interface LoginInfo {
     username: string;
     password: string;
 }
 
-export const login_thunk = createAsyncThunk(
-    "user/login",
-    async (userData: LoginInfo, thunkAPI) => {
-        const result = await fetch(process.env.REACT_APP_URL + "/user/login", {
-            method: "post",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(userData),
-        });
+interface AuthType {
+    data: FormData;
+    access_token: string;
+}
 
-        if (result.status === 200) return result.json();
-        return thunkAPI.rejectWithValue("error");
-    }
-);
-
-export const getNewToken_thunk = createAsyncThunk(
-    "user/get-new-token",
-    async (refresh_token: string, thunkAPI) => {
-        if (refresh_token === "") {
-            return thunkAPI.rejectWithValue("error");
-        }
-        const result = await fetch(
-            process.env.REACT_APP_URL + "/user/get-new-token",
-            {
-                method: "post",
-                headers: {
-                    "content-type": "application/json",
-                },
-                body: JSON.stringify({ refresh_token }),
+const axiosConfig = new AxiosConfig();
+export default class UserThunk {
+    static login() {
+        return createAsyncThunk(
+            "user/login",
+            async (userData: LoginInfo, thunkAPI) => {
+                const result = await axiosConfig.config({ isFormData: false })({
+                    method: "post",
+                    url: "/user/login",
+                    data: JSON.stringify(userData),
+                });
+                if (result.status === 200) return result.data;
+                return thunkAPI.rejectWithValue("error");
             }
         );
-        if (result.status === 200) {
-            return result.json();
-        }
-        return thunkAPI.rejectWithValue("error");
     }
-);
 
-export const getUserReload_thunk = createAsyncThunk(
-    "user/get-user-reload",
-    async (refresh_token: string, thunkAPI) => {
-        if (refresh_token === "") {
-            return thunkAPI.rejectWithValue("error");
-        }
+    static getUserReload() {
+        return createAsyncThunk(
+            "user/get-user-reload",
+            async (refresh_token: string, thunkAPI) => {
+                if (refresh_token.length === 0) {
+                    return thunkAPI.rejectWithValue("error");
+                }
 
-        const result = await fetch(
-            process.env.REACT_APP_URL + "/user/get-user-reload",
-            {
-                method: "post",
-                headers: {
-                    "content-type": "application/json",
-                },
-                body: JSON.stringify({ refresh_token }),
+                const result = await axiosConfig.config({ isFormData: false })({
+                    method: "post",
+                    url: "/user/get-user-reload",
+                    data: JSON.stringify({ refresh_token }),
+                });
+
+                if (result.status === 200) {
+                    return result.data;
+                }
+                return thunkAPI.rejectWithValue("error");
             }
         );
-        if (result.status === 200) {
-            return result.json();
-        }
-        return thunkAPI.rejectWithValue("error");
     }
-);
 
-export const register_thunk = createAsyncThunk(
-    "user/register",
-    async (userData: FormData, thunkAPI) => {
-        const result = await fetch(
-            process.env.REACT_APP_URL + "/user/register",
-            {
-                method: "post",
-                // headers: { "Content-Type": "multipart/form-data" },
-                body: userData,
+    static register() {
+        return createAsyncThunk(
+            "user/register",
+            async (userData: FormData, thunkAPI) => {
+                const result = await axiosConfig.config({ isFormData: true })({
+                    method: "post",
+                    url: "/user/register",
+                    data: userData,
+                });
+
+                if (result.status === 200) return result.data;
+                return thunkAPI.rejectWithValue("error");
             }
         );
-        if (result.status === 200) return result.json();
-        return thunkAPI.rejectWithValue("error");
     }
-);
+
+    static getNewToken() {
+        return createAsyncThunk(
+            "user/get-new-token",
+            async (refresh_token: string, thunkAPI) => {
+                if (refresh_token === "") {
+                    return thunkAPI.rejectWithValue("error");
+                }
+                const result = await axiosConfig.config({ isFormData: false })({
+                    method: "post",
+                    url: "/user/get-new-token",
+                    data: JSON.stringify({ refresh_token }),
+                });
+                if (result.status === 200) {
+                    return result.data;
+                }
+                return thunkAPI.rejectWithValue("error");
+            }
+        );
+    }
+
+    static update() {
+        return createAsyncThunk(
+            "user/update",
+            async (new_data: AuthType, thunkAPI) => {
+                const { data, access_token } = new_data;
+                const result = await axiosConfig.config({
+                    isFormData: true,
+                    access_token: access_token,
+                })({
+                    method: "post",
+                    url: "/user/update",
+                    data: data,
+                    // headers: {
+                    //     Authorization: "Bearer " + access_token,
+                    // },
+                });
+
+                if (result.status === 200) return result.data;
+                return thunkAPI.rejectWithValue("error");
+            }
+        );
+    }
+}

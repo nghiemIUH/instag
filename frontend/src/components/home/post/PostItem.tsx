@@ -56,7 +56,12 @@ function PostItem(props: Props) {
     const handleLike = () => {
         const username = userState.user.username;
         const _id = props._id as string;
-        dispatch(PostThunk.like()({ username, _id }));
+        dispatch(
+            PostThunk.like()({
+                _data: { username, _id },
+                access_token: userState.access_token,
+            })
+        );
     };
 
     const toastId = useRef<Id | null>(null);
@@ -83,10 +88,15 @@ function PostItem(props: Props) {
         const username = userState.user.username;
         const _id = props._id as string;
 
-        dispatch(PostThunk.comment()({ username, _id, content }));
+        dispatch(
+            PostThunk.comment()({
+                _data: { username, _id, content },
+                access_token: userState.access_token,
+            })
+        );
         comment_input.value = "";
     };
-
+    // console.log(props.likes.includes(userState.user._id as string));
     return (
         <div className={cls("post_item")}>
             {/* title */}
@@ -100,7 +110,7 @@ function PostItem(props: Props) {
                         }
                         alt=""
                     />
-                    <div style={{ fontSize: "0.9rem", fontWeight: 600 }}>
+                    <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>
                         {props.userName}
                     </div>
                 </div>

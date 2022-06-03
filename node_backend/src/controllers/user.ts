@@ -50,6 +50,7 @@ class UserController {
 
     getNewAccessToken(request: Request, response: Response) {
         const token = request.body.refresh_token as string;
+
         if (token) {
             try {
                 const user = verify(
@@ -119,6 +120,23 @@ class UserController {
             ],
         }).select("username avatar fullName");
         return response.status(200).send(user);
+    }
+    async update(request: Request, response: Response) {
+        const data = request.body;
+        if (data.password) {
+            data.password = bcrypt.hashSync(data.password, 10);
+        }
+        if (request.file) {
+            data.avatar = request.file?.filename as string;
+        }
+        const user = await UserModel.findOneAndUpdate(
+            { username: data.username },
+            data
+        );
+        if (user) {
+            return response.status(200).send({ user });
+        }
+        return response.status(400).send({ user });
     }
 }
 

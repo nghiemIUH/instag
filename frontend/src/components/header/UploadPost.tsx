@@ -4,6 +4,7 @@ import { BiImageAdd } from "react-icons/bi";
 import { TiDelete } from "react-icons/ti";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import PostThunk from "../../redux/post/thunk";
+// import { axiosFormData } from "../../configs/axiosConfig";
 
 import "./header.css";
 
@@ -68,7 +69,12 @@ function UploadPost({ modalIsOpen, closeModal }: Props) {
         for (const img of arrayImage) {
             formData.append("images", img, img.name);
         }
-        dispatch(PostThunk.addPost()(formData));
+        dispatch(
+            PostThunk.addPost()({
+                _data: formData,
+                access_token: userState.access_token,
+            })
+        );
         setReload(true);
     };
 

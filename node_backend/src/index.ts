@@ -6,23 +6,25 @@ import morgan from "morgan";
 import routers from "./routers/index";
 import connectDB from "./config/connect";
 import { Server } from "socket.io";
-import { createServer } from "http";
 import { onConnect } from "./socket/index";
 
 dotenv.config();
 const PORT: number = parseInt(process.env.PORT as string);
 const app = express();
 app.use("/static", express.static("static"));
-
 app.use(morgan("dev"));
+app.use(
+    cors({
+        origin: ["http://localhost:3000"],
+    })
+);
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(cors());
-routers(app);
 connectDB();
+routers(app);
 
-const server = createServer(app);
+const server = app.listen(PORT);
 
 const io = new Server(server, {
     cors: {
@@ -30,4 +32,3 @@ const io = new Server(server, {
     },
 });
 onConnect(io);
-server.listen(PORT);

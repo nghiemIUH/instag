@@ -10,5 +10,6 @@ postRouter.get("/get-all", post.getAll);
 postRouter.post("/like", post.likePost);
 postRouter.post("/comment", post.addComment);
 postRouter.post("/get-comment", post.getComment);
+postRouter.post("/get-post-by-userid", post.getPostUserID);
 
 export default postRouter;

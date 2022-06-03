@@ -99,17 +99,43 @@
     .avatar {
         display: flex;
         align-items: center;
+        position: relative;
         img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             margin-right: 10px;
         }
+        .sub_menu {
+            visibility: hidden;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100px;
+            background-color: rgba($color: #000000, $alpha: 0.1);
+            align-items: center;
+            border-radius: 10px;
+            padding: 10px 5px;
+
+            a {
+                text-decoration: none;
+                color: #000;
+                width: 80%;
+                text-align: center;
+                padding: 5px 5px;
+                border-radius: 5px;
+                &:hover {
+                    background-color: rgba($color: #000000, $alpha: 0.3);
+                }
+            }
+        }
 
         &:hover .sub_menu {
             visibility: visible;
             animation-name: hoverexpandSubmenu;
-            animation-duration: 0.5s;
+            animation-duration: 0.2s;
         }
         .logout {
             font-size: 1rem;
@@ -125,6 +151,6 @@
         height: 25px;
     }
     to {
-        height: 100px;
+        height: 60px;
     }
 }

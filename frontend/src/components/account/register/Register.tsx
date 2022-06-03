@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import classNames from "classnames/bind";
 import style from "./Register.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { register_thunk } from "../../../redux/user/thunk";
+import UserThunk from "../../../redux/user/thunk";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useState } from "react";
 import {
@@ -138,7 +138,7 @@ function Register() {
         formData.append("fullName", data.fullName);
         formData.append("avatar", data.avatar as File, data.avatar?.name);
 
-        dispatch(register_thunk(formData));
+        dispatch(UserThunk.register()(formData));
     };
     return (
         <div className={cls("register")}>
