@@ -3,7 +3,6 @@ import { verify } from "jsonwebtoken";
 
 const authen = (request: Request, response: Response, next: NextFunction) => {
     let token = request.headers["authorization"] as string;
-    console.log(token);
 
     if (token) {
         try {

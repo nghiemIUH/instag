@@ -15,7 +15,7 @@ interface UserState {
 const initialState = {
     user: {} as UserInfo,
     access_token: "",
-    isLogin: true,
+    isLogin: false,
     error: false,
     isRegister: false,
     isLoading: true,
@@ -45,16 +45,13 @@ export const userSlice = createSlice({
         });
         builder.addCase(
             UserThunk.login().fulfilled,
-            (state, action: PayloadAction<User>) => {
+            (state: UserState, action: PayloadAction<User>) => {
                 Cookies.set("refresh_token", action.payload.refresh_token);
-
-                return {
-                    ...state,
-                    ...action.payload,
-                    isLogin: true,
-                    error: false,
-                    isLoading: false,
-                };
+                state.isLogin = true;
+                state.error = false;
+                state.isLoading = false;
+                state.access_token = action.payload.access_token;
+                state.user = action.payload.user;
             }
         );
 

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { AxiosConfig } from "../../configs/axiosConfig";
+import axiosConfig from "../../configs/axiosConfig";
 interface LoginInfo {
     username: string;
     password: string;
@@ -10,13 +10,12 @@ interface AuthType {
     access_token: string;
 }
 
-const axiosConfig = new AxiosConfig();
 export default class UserThunk {
     static login() {
         return createAsyncThunk(
             "user/login",
             async (userData: LoginInfo, thunkAPI) => {
-                const result = await axiosConfig.config({ isFormData: false })({
+                const result = await axiosConfig({ isFormData: false })({
                     method: "post",
                     url: "/user/login",
                     data: JSON.stringify(userData),
@@ -35,7 +34,7 @@ export default class UserThunk {
                     return thunkAPI.rejectWithValue("error");
                 }
 
-                const result = await axiosConfig.config({ isFormData: false })({
+                const result = await axiosConfig({ isFormData: false })({
                     method: "post",
                     url: "/user/get-user-reload",
                     data: JSON.stringify({ refresh_token }),
@@ -53,7 +52,7 @@ export default class UserThunk {
         return createAsyncThunk(
             "user/register",
             async (userData: FormData, thunkAPI) => {
-                const result = await axiosConfig.config({ isFormData: true })({
+                const result = await axiosConfig({ isFormData: true })({
                     method: "post",
                     url: "/user/register",
                     data: userData,
@@ -72,7 +71,7 @@ export default class UserThunk {
                 if (refresh_token === "") {
                     return thunkAPI.rejectWithValue("error");
                 }
-                const result = await axiosConfig.config({ isFormData: false })({
+                const result = await axiosConfig({ isFormData: false })({
                     method: "post",
                     url: "/user/get-new-token",
                     data: JSON.stringify({ refresh_token }),
@@ -90,16 +89,13 @@ export default class UserThunk {
             "user/update",
             async (new_data: AuthType, thunkAPI) => {
                 const { data, access_token } = new_data;
-                const result = await axiosConfig.config({
+                const result = await axiosConfig({
                     isFormData: true,
                     access_token: access_token,
                 })({
                     method: "post",
                     url: "/user/update",
                     data: data,
-                    // headers: {
-                    //     Authorization: "Bearer " + access_token,
-                    // },
                 });
 
                 if (result.status === 200) return result.data;

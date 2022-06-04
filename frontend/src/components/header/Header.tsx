@@ -44,7 +44,7 @@ function Header() {
     useEffect(() => {
         const refresh_token = Cookies.get("refresh_token") as string;
 
-        const minute = 1000 * 60 * 1;
+        const minute = 1000 * 60 * 3;
         const interval = setInterval(() => {
             if (userState.isLogin) {
                 dispatch(UserThunk.getNewToken()(refresh_token || ""));
@@ -120,6 +120,7 @@ function Header() {
                         onChange={(e) => {
                             setInputSearch(e.target.value.trim());
                         }}
+                        disabled={userState.isLogin}
                     />
                 </div>
 

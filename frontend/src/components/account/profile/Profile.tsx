@@ -9,6 +9,7 @@ import { MdEmail, MdOutlineDriveFileRenameOutline } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { useAppDispatch } from "../../../redux/hooks";
 import UserThunk from "../../../redux/user/thunk";
+import { ToastContainer, toast } from "react-toastify";
 
 const cls = classNames.bind(style);
 function Profile() {
@@ -79,6 +80,8 @@ function Profile() {
             formData.append("avatar", avatar as File, avatar?.name);
         }
 
+        formData.append("username", userState.user.username);
+
         dispatch(
             UserThunk.update()({
                 data: formData,
@@ -87,7 +90,20 @@ function Profile() {
         );
         if (!userState.error) {
             setOpenModal(false);
+            notify();
         }
+    };
+
+    const notify = () => {
+        toast.success("Success", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+        });
     };
 
     return (
@@ -148,6 +164,17 @@ function Profile() {
                     );
                 })}
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover={false}
+            />
             {openModal && (
                 <div className={cls("modal")}>
                     <div className={cls("modal_content")}>
