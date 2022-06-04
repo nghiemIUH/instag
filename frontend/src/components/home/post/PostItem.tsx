@@ -42,12 +42,12 @@ function PostItem(props: Props) {
 
         picker.on("emoji", (selection) => {
             const ipt = document.querySelector(
-                "#comment_input"
+                "#comment_input" + userState.user._id
             ) as HTMLInputElement;
             ipt.value += selection.emoji;
         });
         trigger.addEventListener("click", () => picker.togglePicker(trigger));
-    }, []);
+    }, [userState.user._id]);
 
     const settings = {
         dots: true,
@@ -82,7 +82,7 @@ function PostItem(props: Props) {
     const handleComment = (e: FormEvent) => {
         e.preventDefault();
         const comment_input = document.getElementById(
-            "comment_input"
+            "comment_input" + userState.user._id
         ) as HTMLInputElement;
         const content = comment_input.value;
         const username = userState.user.username;
@@ -96,7 +96,6 @@ function PostItem(props: Props) {
         );
         comment_input.value = "";
     };
-    // console.log(props.likes.includes(userState.user._id as string));
     return (
         <div className={cls("post_item")}>
             {/* title */}
@@ -195,14 +194,14 @@ function PostItem(props: Props) {
 
             <form className={cls("comment")} onSubmit={(e) => handleComment(e)}>
                 <img
-                    src="1f600.png"
+                    src="/1f600.png"
                     alt=""
                     className={cls("select_icon")}
                     id="icon_picker"
                 />
                 <input
                     type="text"
-                    id="comment_input"
+                    id={"comment_input" + userState.user._id}
                     className={cls("comment_input")}
                     placeholder="Add a comment"
                     autoComplete="off"

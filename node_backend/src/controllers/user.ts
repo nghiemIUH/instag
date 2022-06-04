@@ -146,6 +146,16 @@ class UserController {
         }
         return response.status(400).send({ user });
     }
+
+    async findUserProfile(request: Request, response: Response) {
+        const username = request.body.username;
+        const user = await UserModel.findOne({ username: username });
+        if (user) {
+            return response.status(200).send({ user });
+        } else {
+            return response.status(400).send({ result: "error" });
+        }
+    }
 }
 
 export default new UserController();

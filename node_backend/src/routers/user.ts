@@ -9,5 +9,6 @@ userRouter.post("/get-user-reload", UserController.getUserInfo);
 userRouter.get("/search", UserController.search);
 userRouter.use(authen);
 userRouter.post("/update", UserController.update);
+userRouter.post("/find-user-profile", UserController.findUserProfile);
 
 export default userRouter;

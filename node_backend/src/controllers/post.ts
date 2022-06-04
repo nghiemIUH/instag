@@ -79,8 +79,10 @@ class Post {
     }
 
     async getPostUserID(request: Request, response: Response) {
-        const { user_id } = request.body;
-        const user = await UserModel.findById(user_id);
+        const { username } = request.body;
+        const user = await UserModel.findOne({ username: username });
+        console.log(username);
+
         const posts = await PostModel.find({ author: user }).populate({
             path: "author",
             select: "avatar username",

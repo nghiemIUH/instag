@@ -55,12 +55,21 @@
                 left: 45%;
                 transform: rotate(45deg);
                 border-radius: 0 5px 0 5px;
+                z-index: -1;
             }
 
             .result_item {
                 display: flex;
                 align-items: center;
                 padding: 10px;
+                cursor: pointer;
+                border-radius: 10px;
+                text-decoration: none;
+                color: #000;
+
+                &:hover {
+                    background-color: rgba($color: #000000, $alpha: 0.08);
+                }
 
                 img {
                     width: 40px;

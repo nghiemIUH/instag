@@ -120,7 +120,7 @@ function Header() {
                         onChange={(e) => {
                             setInputSearch(e.target.value.trim());
                         }}
-                        disabled={userState.isLogin}
+                        disabled={!userState.isLogin}
                     />
                 </div>
 
@@ -129,9 +129,10 @@ function Header() {
                         {searchResult.length > 0 ? (
                             searchResult?.map((value, index) => {
                                 return (
-                                    <div
+                                    <Link
                                         className={cls("result_item")}
                                         key={index}
+                                        to={"/profile/" + value.username}
                                     >
                                         <img
                                             src={
@@ -144,14 +145,10 @@ function Header() {
                                         <div
                                             className={cls("result_user_name")}
                                         >
-                                            <div>
-                                                <a href="https://google.com">
-                                                    {value.username}
-                                                </a>
-                                            </div>
+                                            <div>{value.username}</div>
                                             <div>{value.fullName}</div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 );
                             })
                         ) : (
@@ -200,7 +197,9 @@ function Header() {
                         alt=""
                     />
                     <div className={cls("sub_menu")}>
-                        <Link to="/profile">Profile</Link>
+                        <Link to={"/profile/" + userState.user.username}>
+                            Profile
+                        </Link>
                         <Link to="/login" onClick={handleLogOut}>
                             Logout
                         </Link>

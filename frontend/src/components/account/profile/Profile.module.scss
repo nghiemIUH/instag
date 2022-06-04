@@ -40,11 +40,17 @@
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
                     Roboto, Helvetica, Arial, sans-serif;
 
-                button {
+                .btn_edit {
                     padding: 0 10px;
                     font-size: 12px;
                     border: 0.5px solid lightgray;
                     font-weight: 600;
+                    cursor: pointer;
+                }
+                .btn_follow {
+                    color: blue;
+                    border: none;
+                    background-color: #fafafa;
                     cursor: pointer;
                 }
             }

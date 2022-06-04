@@ -1,6 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
 import classNames from "classnames/bind";
-
 import { useAppSelector } from "../../../redux/hooks";
 import style from "./Profile.module.scss";
 import { Post } from "../../../entities/post";
@@ -10,16 +9,47 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { useAppDispatch } from "../../../redux/hooks";
 import UserThunk from "../../../redux/user/thunk";
 import { ToastContainer, toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
+import { UserInfo } from "../../../entities/user";
+import axiosConfig from "../../../configs/axiosConfig";
 
 const cls = classNames.bind(style);
 function Profile() {
-    const userState = useAppSelector((state) => state.user);
+    const location = useLocation();
+    const username = location.pathname.split("/")[2];
+
+    const currentUser = useAppSelector((state) => state.user);
+    const [userState, setUserState] = useState<UserInfo | null>(
+        currentUser.user.username === username ? currentUser.user : null
+    );
+
     const postState = useAppSelector((state) => state.post);
     const [openModal, setOpenModal] = useState(false);
     const [post, setPost] = useState<Array<Post>>([]);
     const [avatar, setAvatar] = useState<File | null>(null);
 
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        if (username !== currentUser.user.username) {
+            const result = async () => {
+                return await axiosConfig({
+                    isFormData: false,
+                    access_token: currentUser.access_token,
+                })({
+                    method: "post",
+                    url: "/user/find-user-profile",
+                    data: JSON.stringify({ username }),
+                });
+            };
+            result().then((response) => {
+                setUserState({ ...response.data.user });
+            });
+        } else {
+            setUserState(currentUser.user);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [username]);
 
     useEffect(() => {
         const result = async () => {
@@ -29,9 +59,9 @@ function Profile() {
                     method: "post",
                     headers: {
                         "content-type": "application/json",
-                        Authorization: "Bearer " + userState.access_token,
+                        Authorization: "Bearer " + currentUser?.access_token,
                     },
-                    body: JSON.stringify({ user_id: userState.user._id }),
+                    body: JSON.stringify({ username: username }),
                 }
             );
         };
@@ -43,7 +73,7 @@ function Profile() {
                 setPost(data.posts);
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [postState]);
+    }, [postState, username]);
 
     const handleEditProfile = async (e: FormEvent) => {
         e.preventDefault();
@@ -80,15 +110,17 @@ function Profile() {
             formData.append("avatar", avatar as File, avatar?.name);
         }
 
-        formData.append("username", userState.user.username);
+        if (userState) {
+            formData.append("username", currentUser.user.username);
+        }
 
         dispatch(
             UserThunk.update()({
                 data: formData,
-                access_token: userState.access_token,
+                access_token: currentUser?.access_token as string,
             })
         );
-        if (!userState.error) {
+        if (!currentUser?.error) {
             setOpenModal(false);
             notify();
         }
@@ -108,160 +140,176 @@ function Profile() {
 
     return (
         <div className={cls("profile")}>
-            <div className={cls("profile_info")}>
-                <img
-                    src={
-                        process.env.REACT_APP_URL +
-                        "/static/avatars/" +
-                        userState.user.avatar
-                    }
-                    alt=""
-                    className={cls("avatar")}
-                />
-
-                <div className={cls("user_info")}>
-                    <div className={cls("user_info_row_1")}>
-                        <div>{userState.user.username}</div>
-                        <button
-                            className={cls("btn_edit")}
-                            onClick={() => setOpenModal(true)}
-                        >
-                            Edit profile
-                        </button>
-                    </div>
-                    <div className={cls("user_info_row_2")}>
-                        <div>
-                            <span>0</span> post
-                        </div>
-                        <div>
-                            <span>0</span> followers
-                        </div>
-                        <div>
-                            <span>0</span> following
-                        </div>
-                    </div>
-
-                    <div className={cls("user_info_row_3")}>
-                        {userState.user.fullName}
-                    </div>
-                </div>
-            </div>
-            <div className={cls("break")}></div>
-            <div className={cls("posts")}>
-                {post.map((value, index) => {
-                    return (
-                        <PostItem
-                            key={index}
-                            userName={value.author.username}
-                            avatar={value.author.avatar}
-                            images={value.images}
-                            likes={value.likes}
-                            num_comment={value.comments.length}
-                            description={value.content}
-                            create_time={new Date(value.date_update)}
-                            _id={value._id}
+            {!userState ? (
+                <div>Loading...</div>
+            ) : (
+                <>
+                    <div className={cls("profile_info")}>
+                        <img
+                            src={
+                                process.env.REACT_APP_URL +
+                                "/static/avatars/" +
+                                userState?.avatar
+                            }
+                            alt=""
+                            className={cls("avatar")}
                         />
-                    );
-                })}
-            </div>
-            <ToastContainer
-                position="top-right"
-                autoClose={2000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover={false}
-            />
-            {openModal && (
-                <div className={cls("modal")}>
-                    <div className={cls("modal_content")}>
-                        <div
-                            className={cls("modal_close")}
-                            onClick={() => setOpenModal(false)}
-                        >
-                            &times;
-                        </div>
-                        <div className={cls("modal_body")}>
-                            <form
-                                className={cls("form_edit")}
-                                onSubmit={(e) => handleEditProfile(e)}
-                            >
-                                <div className={cls("form_group")}>
-                                    <img
-                                        src={
-                                            avatar
-                                                ? URL.createObjectURL(avatar)
-                                                : process.env.REACT_APP_URL +
-                                                  "/static/avatars/" +
-                                                  userState.user.avatar
-                                        }
-                                        alt=""
-                                    />
-                                    <label htmlFor="channe_avatar">
-                                        Change avatar
-                                    </label>
-                                    <input
-                                        type="file"
-                                        accept=".gif,.jpg,.jpeg,.png"
-                                        id="channe_avatar"
-                                        hidden
-                                        onChange={(e) => {
-                                            const fileList = e.target.files;
-                                            if (!fileList) return;
-                                            setAvatar(fileList[0]);
-                                        }}
-                                    />
-                                </div>
-                                <div className={cls("form_group")}>
-                                    <label htmlFor="">
-                                        <RiLockPasswordLine />
-                                    </label>
-                                    <input
-                                        type="password"
-                                        placeholder="Password"
-                                        id="password"
-                                    />
-                                </div>
-                                <div className={cls("form_group")}>
-                                    <label htmlFor="">
-                                        <RiLockPasswordLine />
-                                    </label>
-                                    <input
-                                        type="password"
-                                        placeholder="Confirm password"
-                                    />
-                                </div>
 
-                                <div className={cls("form_group")}>
-                                    <label htmlFor="">
-                                        <MdEmail />
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Email"
-                                        id="email"
-                                    />
+                        <div className={cls("user_info")}>
+                            <div className={cls("user_info_row_1")}>
+                                <div>{userState?.username}</div>
+                                {currentUser.user.username === username ? (
+                                    <button
+                                        className={cls("btn_edit")}
+                                        onClick={() => setOpenModal(true)}
+                                    >
+                                        Edit profile
+                                    </button>
+                                ) : (
+                                    <button className={cls("btn_follow")}>
+                                        Follow
+                                    </button>
+                                )}
+                            </div>
+                            <div className={cls("user_info_row_2")}>
+                                <div>
+                                    <span>0</span> post
                                 </div>
-                                <div className={cls("form_group")}>
-                                    <label htmlFor="">
-                                        <MdOutlineDriveFileRenameOutline />
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Full name"
-                                        id="fullName"
-                                    />
+                                <div>
+                                    <span>0</span> followers
                                 </div>
-                                <div className={cls("form_submit")}>
-                                    <button>Save</button>
+                                <div>
+                                    <span>0</span> following
                                 </div>
-                            </form>
+                            </div>
+
+                            <div className={cls("user_info_row_3")}>
+                                {userState?.fullName}
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div className={cls("break")}></div>
+                    <div className={cls("posts")}>
+                        {post.map((value, index) => {
+                            return (
+                                <PostItem
+                                    key={index}
+                                    userName={value.author.username}
+                                    avatar={value.author.avatar}
+                                    images={value.images}
+                                    likes={value.likes}
+                                    num_comment={value.comments.length}
+                                    description={value.content}
+                                    create_time={new Date(value.date_update)}
+                                    _id={value._id}
+                                />
+                            );
+                        })}
+                    </div>
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={2000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover={false}
+                    />
+                    {openModal && (
+                        <div className={cls("modal")}>
+                            <div className={cls("modal_content")}>
+                                <div
+                                    className={cls("modal_close")}
+                                    onClick={() => setOpenModal(false)}
+                                >
+                                    &times;
+                                </div>
+                                <div className={cls("modal_body")}>
+                                    <form
+                                        className={cls("form_edit")}
+                                        onSubmit={(e) => handleEditProfile(e)}
+                                    >
+                                        <div className={cls("form_group")}>
+                                            <img
+                                                src={
+                                                    avatar
+                                                        ? URL.createObjectURL(
+                                                              avatar
+                                                          )
+                                                        : process.env
+                                                              .REACT_APP_URL +
+                                                          "/static/avatars/" +
+                                                          userState?.avatar
+                                                }
+                                                alt=""
+                                            />
+                                            <label htmlFor="channe_avatar">
+                                                Change avatar
+                                            </label>
+                                            <input
+                                                type="file"
+                                                accept=".gif,.jpg,.jpeg,.png"
+                                                id="channe_avatar"
+                                                hidden
+                                                onChange={(e) => {
+                                                    const fileList =
+                                                        e.target.files;
+                                                    if (!fileList) return;
+                                                    setAvatar(fileList[0]);
+                                                }}
+                                            />
+                                        </div>
+                                        <div className={cls("form_group")}>
+                                            <label htmlFor="">
+                                                <RiLockPasswordLine />
+                                            </label>
+                                            <input
+                                                type="password"
+                                                placeholder="Password"
+                                                id="password"
+                                            />
+                                        </div>
+                                        <div className={cls("form_group")}>
+                                            <label htmlFor="">
+                                                <RiLockPasswordLine />
+                                            </label>
+                                            <input
+                                                type="password"
+                                                placeholder="Confirm password"
+                                            />
+                                        </div>
+
+                                        <div className={cls("form_group")}>
+                                            <label htmlFor="">
+                                                <MdEmail />
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="Email"
+                                                id="email"
+                                            />
+                                        </div>
+                                        <div className={cls("form_group")}>
+                                            <label htmlFor="">
+                                                <MdOutlineDriveFileRenameOutline />
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="Full name"
+                                                id="fullName"
+                                            />
+                                        </div>
+                                        <div className={cls("form_submit")}>
+                                            <button>Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
