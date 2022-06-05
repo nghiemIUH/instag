@@ -1,3 +1,5 @@
 frontend/node_modules
 node_backend/node_modules
 node_backend/build
+node_backend/.env
+frontend/.env.local
