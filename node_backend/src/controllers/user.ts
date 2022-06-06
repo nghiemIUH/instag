@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
-import { User, UserModel } from "../models/user";
+import { User, UserModel, FollowModel } from "../models/user";
 import { unlink } from "fs";
-import path from "path";
 class UserController {
+    /**
+     * POST METHOD
+     * /user/register
+     * @param request
+     * @param response
+     */
     async register(request: Request, response: Response) {
         const data = request.body as User;
 
@@ -26,6 +31,12 @@ class UserController {
         }
     }
 
+    /**
+     * POST METHOD
+     * /user/login
+     * @param request
+     * @param response
+     */
     async login(request: Request, response: Response) {
         const data = request.body;
         const user = (await UserModel.findOne({
@@ -49,6 +60,12 @@ class UserController {
         }
     }
 
+    /**
+     * POST METHOD
+     * /user/get-new-token
+     * @param request
+     * @param response
+     */
     getNewAccessToken(request: Request, response: Response) {
         const token = request.body.refresh_token as string;
 
@@ -73,6 +90,12 @@ class UserController {
         }
     }
 
+    /**
+     * POST METHOD
+     * /user/get-user-reload
+     * @param request
+     * @param response
+     */
     async getUserInfo(request: Request, response: Response) {
         const token = request.body.refresh_token as string;
 
@@ -102,6 +125,13 @@ class UserController {
         }
     }
 
+    /**
+     * GET METHOD
+     * /user/search
+     * @param request
+     * @param response
+     * @returns
+     */
     async search(request: Request, response: Response) {
         const search = request.query.search as string;
 
@@ -123,6 +153,13 @@ class UserController {
         }).select("username avatar fullName");
         return response.status(200).send(user);
     }
+    /**
+     * POST METHOD
+     * /user/update
+     * @param request
+     * @param response
+     * @returns
+     */
     async update(request: Request, response: Response) {
         const data = request.body;
         const old_user = await UserModel.findOne({ username: data.username });
@@ -147,6 +184,13 @@ class UserController {
         return response.status(400).send({ user });
     }
 
+    /**
+     * POST METHOD
+     * /user/find-user-profile
+     * @param request
+     * @param response
+     * @returns
+     */
     async findUserProfile(request: Request, response: Response) {
         const username = request.body.username;
         const user = await UserModel.findOne({ username: username });
@@ -154,6 +198,70 @@ class UserController {
             return response.status(200).send({ user });
         } else {
             return response.status(400).send({ result: "error" });
+        }
+    }
+
+    /**
+     * POST
+     * /user/get-follow
+     * @param request
+     * @param response
+     * @returns
+     */
+    async getFollow(request: Request, response: Response) {
+        const username = request.body.username;
+        const user = await UserModel.findOne({ username: username });
+        const follow = await FollowModel.findOne({ user: user });
+        return response.status(200).send({ follow });
+    }
+
+    /**
+     * POST METHOD
+     * /user/follow
+     * @param request
+     * @param response
+     * @returns
+     */
+    async follow(request: Request, response: Response) {
+        const { current_username, other_username } = request.body;
+
+        const curren_user = await UserModel.findOne({
+            username: current_username,
+        });
+        const other_user = await UserModel.findOne({
+            username: other_username,
+        });
+
+        const curren_follow = await FollowModel.findOne({ user: curren_user });
+        const other_follow = await FollowModel.findOne({ user: other_user });
+
+        if (curren_follow === null) {
+            await FollowModel.create({ user: curren_user });
+            await FollowModel.create({ user: other_user });
+        }
+
+        if (curren_follow?.followers.includes(other_follow?.user)) {
+            // unfollow
+            await FollowModel.updateOne(
+                { user: curren_user },
+                { $pull: { followers: other_user?.id } }
+            );
+            await FollowModel.updateOne(
+                { user: other_user },
+                { $pull: { followings: curren_user?.id } }
+            );
+            return response.status(200).send({ result: "unfollow" });
+        } else {
+            // follow
+            await FollowModel.updateOne(
+                { user: curren_user },
+                { $push: { followers: other_user?.id } }
+            );
+            await FollowModel.updateOne(
+                { user: other_user },
+                { $push: { followings: curren_user?.id } }
+            );
+            return response.status(200).send({ result: "follow" });
         }
     }
 }

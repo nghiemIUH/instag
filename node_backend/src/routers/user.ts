@@ -10,5 +10,7 @@ userRouter.get("/search", UserController.search);
 userRouter.use(authen);
 userRouter.post("/update", UserController.update);
 userRouter.post("/find-user-profile", UserController.findUserProfile);
+userRouter.post("/get-follow", UserController.getFollow);
+userRouter.post("/follow", UserController.follow);
 
 export default userRouter;
