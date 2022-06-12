@@ -12,49 +12,25 @@ import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { UserInfo } from "../../../entities/user";
 import axiosConfig from "../../../configs/axiosConfig";
+import FollowThunk from "../../../redux/follow/thunk";
 
 const cls = classNames.bind(style);
 function Profile() {
     const location = useLocation();
     const username = location.pathname.split("/")[2];
+    const dispatch = useAppDispatch();
 
     const currentUser = useAppSelector((state) => state.user);
     const [userState, setUserState] = useState<UserInfo | null>(
         currentUser.user.username === username ? currentUser.user : null
     );
 
-    const [follow, setFollow] = useState<Follow | null>({
-        user: "",
-        followers: [],
-        followings: [],
-    });
+    const followState = useAppSelector((state) => state.follow);
 
     const postState = useAppSelector((state) => state.post);
     const [openModal, setOpenModal] = useState(false);
     const [post, setPost] = useState<Array<Post>>([]);
     const [avatar, setAvatar] = useState<File | null>(null);
-
-    const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        const result = async () => {
-            return await axiosConfig({
-                isFormData: false,
-                access_token: currentUser.access_token,
-            })({
-                method: "post",
-                url: "/user/get-follow",
-                data: JSON.stringify({
-                    username: currentUser.user.username,
-                }),
-            });
-        };
-        result().then((response) => {
-            setFollow(response.data.follow);
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    console.log(follow);
 
     useEffect(() => {
         if (username !== currentUser.user.username) {
@@ -165,23 +141,13 @@ function Profile() {
     };
 
     const handleFollow = async () => {
-        await axiosConfig({
-            isFormData: false,
-            access_token: currentUser.access_token,
-        })({
-            method: "post",
-            url: "/user/follow",
-            data: JSON.stringify({
+        dispatch(
+            FollowThunk.follow_unfollow()({
+                access_token: currentUser.access_token,
                 current_username: currentUser.user.username,
                 other_username: username,
-            }),
-        })
-            .then((result) => {
-                console.log(result);
             })
-            .catch((error) => {
-                console.log(error);
-            });
+        );
     };
 
     return (
@@ -216,9 +182,11 @@ function Profile() {
                                         className={cls("btn_follow")}
                                         onClick={handleFollow}
                                     >
-                                        {follow?.followers.includes(
-                                            currentUser.user._id as string
-                                        )
+                                        {followState.follow?.followers
+                                            ?.map((value) => {
+                                                return value.username;
+                                            })
+                                            .includes(username)
                                             ? "Unfollow"
                                             : "Follow"}
                                     </button>
@@ -366,12 +334,6 @@ function Profile() {
             )}
         </div>
     );
-}
-
-interface Follow {
-    user: string;
-    followers: Array<string>;
-    followings: Array<string>;
 }
 
 export default Profile;

@@ -1,10 +1,10 @@
 export interface UserInfo {
-    _id?: string;
+    _id: string;
     username: string;
-    password: string;
-    email: string;
-    fullName: string;
-    avatar: string;
+    password?: string;
+    email?: string;
+    fullName?: string;
+    avatar?: string;
 }
 
 export interface User {

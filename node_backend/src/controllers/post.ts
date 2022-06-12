@@ -81,7 +81,6 @@ class Post {
     async getPostUserID(request: Request, response: Response) {
         const { username } = request.body;
         const user = await UserModel.findOne({ username: username });
-        console.log(username);
 
         const posts = await PostModel.find({ author: user }).populate({
             path: "author",

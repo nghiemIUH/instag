@@ -54,6 +54,7 @@ class UserController {
                 process.env.REFRESH_TOKEN_SECRET as string,
                 { expiresIn: process.env.REFRESH_TOKEN_LIFE }
             );
+
             response.status(200).send({ user, access_token, refresh_token });
         } else {
             response.status(404).send({ result: "error" });
@@ -211,7 +212,11 @@ class UserController {
     async getFollow(request: Request, response: Response) {
         const username = request.body.username;
         const user = await UserModel.findOne({ username: username });
-        const follow = await FollowModel.findOne({ user: user });
+        const follow = await FollowModel.findOne({ user: user }).populate(
+            "followers",
+            { _id: 1, username: 1 }
+        );
+
         return response.status(200).send({ follow });
     }
 
@@ -250,7 +255,6 @@ class UserController {
                 { user: other_user },
                 { $pull: { followings: curren_user?.id } }
             );
-            return response.status(200).send({ result: "unfollow" });
         } else {
             // follow
             await FollowModel.updateOne(
@@ -261,8 +265,11 @@ class UserController {
                 { user: other_user },
                 { $push: { followings: curren_user?.id } }
             );
-            return response.status(200).send({ result: "follow" });
         }
+        const new_follow = await FollowModel.findOne({
+            user: curren_user,
+        }).populate("followers", { _id: 1, username: 1 });
+        return response.status(200).send({ new_follow: new_follow });
     }
 }
 
