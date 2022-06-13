@@ -169,10 +169,15 @@ function Header() {
                         onClick={() => setSelectMenu("home")}
                     />
                 </Link>
-                <AiOutlineMessage
-                    style={{ color: selectMenu === "mess" ? "red" : "black" }}
-                    onClick={() => setSelectMenu("mess")}
-                />
+                <Link to="/chat">
+                    <AiOutlineMessage
+                        style={{
+                            color: selectMenu === "mess" ? "red" : "black",
+                        }}
+                        onClick={() => setSelectMenu("mess")}
+                    />
+                </Link>
+
                 <BiMessageAltAdd
                     style={{ color: selectMenu === "add" ? "red" : "black" }}
                     onClick={openModal}

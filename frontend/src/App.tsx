@@ -10,6 +10,7 @@ import UserThunk from "./redux/user/thunk";
 import Profile from "./components/account/profile/Profile";
 import Cookies from "js-cookie";
 import FollowThunk from "./redux/follow/thunk";
+import Chat from "./components/chat/Chat";
 function App() {
     const userState = useAppSelector((state) => state.user);
     const dispatch = useAppDispatch();
@@ -51,6 +52,7 @@ function App() {
                                 path="/profile/:username"
                                 element={<Profile />}
                             />
+                            <Route path="/chat" element={<Chat />} />
                         </Route>
 
                         <Route element={<Login />} path="/login" />

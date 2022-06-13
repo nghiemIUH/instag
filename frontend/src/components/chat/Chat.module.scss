@@ -1,0 +1,120 @@
+.chat {
+    width: 70%;
+    height: 85vh;
+    margin: 0 auto;
+    margin-top: 10vh;
+    display: flex;
+    border: 1px solid lightgray;
+    .old_chat {
+        border-right: 1px solid lightgray;
+        flex: 0.4;
+        height: 100%;
+        .search_friend {
+            height: 10%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid lightgray;
+
+            .search_block {
+                display: flex;
+                align-items: center;
+                width: 70%;
+                background-color: #efefef;
+                border-radius: 20px;
+                input {
+                    width: 90%;
+                    border: none;
+                    background-color: #efefef;
+                    padding: 10px 10px;
+                    border-radius: 20px;
+                    &:focus {
+                        outline: none;
+                    }
+                }
+                svg {
+                    width: 15%;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                }
+            }
+        }
+        .list_friend {
+            display: flex;
+            padding-left: 20px;
+            flex-direction: column;
+            .friend {
+                display: flex;
+                align-items: center;
+                margin-top: 10px;
+                img {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    margin-right: 10px;
+                    cursor: pointer;
+                }
+                div {
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+    .chat_box {
+        max-height: 100%;
+        flex: 0.6;
+        .chat_header {
+            height: 10%;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid lightgray;
+
+            img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 20px;
+            }
+        }
+        .chat_body {
+            height: 85%;
+            background-color: gray;
+            overflow-y: scroll;
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+        .chat_footer {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 5%;
+            form {
+                width: 100%;
+                height: 90%;
+                display: flex;
+                justify-content: space-between;
+                input {
+                    width: 90%;
+                    height: 100%;
+                    border: none;
+                    padding-left: 5px;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+                button {
+                    width: 7%;
+                    height: 100%;
+                    background-color: #fff;
+                    border: none;
+                }
+            }
+        }
+    }
+}
