@@ -1,8 +1,6 @@
-import { memo, useContext, useEffect } from "react";
+import { memo, useEffect } from "react";
 import classNames from "classnames/bind";
 import style from "./Home.module.scss";
-import { Socket } from "socket.io-client";
-import SocketContext from "../../context/socket";
 
 import PostItem from "./post/PostItem";
 import Story from "./story/Story";
@@ -12,24 +10,7 @@ import PostThunk from "./../../redux/post/thunk";
 // =========
 const cls = classNames.bind(style);
 
-interface SocketContextType {
-    socket: Socket | null;
-    connect: () => void;
-    disconnect: () => void;
-}
-
 function Home() {
-    const { socket, connect } = useContext(SocketContext) as SocketContextType;
-    useEffect(() => {
-        if (!socket) {
-            connect();
-        }
-        if (!socket?.connected) {
-            connect();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const postState = useAppSelector((state) => state.post);
     const userState = useAppSelector((state) => state.user);
     const dispatch = useAppDispatch();

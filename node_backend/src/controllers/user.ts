@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
-import { User, UserModel, FollowModel } from "../models/user";
+import {
+    User,
+    UserModel,
+    FriendModel,
+    NotifyFriendModel,
+    FriendShipModel,
+} from "../models/user";
 import { unlink } from "fs";
 class UserController {
     /**
@@ -203,73 +209,142 @@ class UserController {
     }
 
     /**
-     * POST
-     * /user/get-follow
+     * /user/get-notify
      * @param request
      * @param response
      * @returns
      */
-    async getFollow(request: Request, response: Response) {
-        const username = request.body.username;
-        const user = await UserModel.findOne({ username: username });
-        const follow = await FollowModel.findOne({ user: user }).populate(
-            "followers",
-            { _id: 1, username: 1 }
-        );
-
-        return response.status(200).send({ follow });
+    async getNotify(request: Request, response: Response) {
+        const { username } = request.body;
+        const user = await UserModel.findOne({ username });
+        const notify = await NotifyFriendModel.find({ user: user }).populate({
+            path: "event",
+            populate: { path: "user_1", select: "username avatar" },
+        });
+        return response.status(200).send({ notify });
     }
 
     /**
-     * POST METHOD
-     * /user/follow
+     * /user/get-friend
      * @param request
      * @param response
      * @returns
      */
-    async follow(request: Request, response: Response) {
-        const { current_username, other_username } = request.body;
+    async getFriend(request: Request, response: Response) {
+        const { username } = request.body;
+        const user = await UserModel.findOne({ username: username });
+        const friend = await FriendModel.findOne({ user: user }).populate(
+            "friend",
+            { _id: 1, username: 1, avatar: 1 }
+        );
+        return response.status(200).send({ friend });
+    }
 
-        const curren_user = await UserModel.findOne({
-            username: current_username,
+    /**
+     * /user/get-friendship
+     * @param request
+     * @param response
+     * @returns
+     */
+    async getFriendShip(request: Request, response: Response) {
+        const { username_1, username_2 } = request.body;
+        const user_1 = await UserModel.findOne({ username: username_1 });
+        const user_2 = await UserModel.findOne({ username: username_2 });
+        const friendShip = await FriendShipModel.findOne({ user_1, user_2 });
+        return response.status(200).send({ friendShip });
+    }
+
+    /**
+     * /user/create-friendship
+     * @param request
+     * @param response
+     * @returns
+     */
+    async cancelFriendShip(request: Request, response: Response) {
+        const { username_1, username_2 } = request.body;
+        const user_1 = await UserModel.findOne({ username: username_1 });
+        const user_2 = await UserModel.findOne({ username: username_2 });
+        const friendShip = await FriendShipModel.findOne({ user_1, user_2 });
+        await NotifyFriendModel.deleteOne({ event: friendShip });
+        await FriendShipModel.deleteOne({ user_1, user_2 });
+        const notify = await NotifyFriendModel.find({ user: user_2 }).populate({
+            path: "event",
+            populate: { path: "user_1", select: "username avatar" },
         });
-        const other_user = await UserModel.findOne({
-            username: other_username,
-        });
+        return response.status(200).send({ notify });
+    }
 
-        const curren_follow = await FollowModel.findOne({ user: curren_user });
-        const other_follow = await FollowModel.findOne({ user: other_user });
+    /**
+     * /user/add-friend
+     * @param request
+     * @param response
+     * @returns
+     */
+    async addFriend(request: Request, response: Response) {
+        const { username_1, username_2 } = request.body;
+        const user_1 = await UserModel.findOne({ username: username_1 });
+        const user_2 = await UserModel.findOne({ username: username_2 });
 
-        if (curren_follow === null) {
-            await FollowModel.create({ user: curren_user });
-            await FollowModel.create({ user: other_user });
-        }
-
-        if (curren_follow?.followers.includes(other_follow?.user)) {
-            // unfollow
-            await FollowModel.updateOne(
-                { user: curren_user },
-                { $pull: { followers: other_user?.id } }
+        const friend = await FriendModel.findOne({ user: user_1 });
+        if (friend) {
+            await FriendModel.updateOne(
+                { user: user_1 },
+                { $push: { friend: user_2 } }
             );
-            await FollowModel.updateOne(
-                { user: other_user },
-                { $pull: { followings: curren_user?.id } }
+            await FriendModel.updateOne(
+                { user: user_2 },
+                { $push: { friend: user_1 } }
             );
         } else {
-            // follow
-            await FollowModel.updateOne(
-                { user: curren_user },
-                { $push: { followers: other_user?.id } }
-            );
-            await FollowModel.updateOne(
-                { user: other_user },
-                { $push: { followings: curren_user?.id } }
-            );
+            await FriendModel.create({ user: user_1, friend: [user_2] });
+            await FriendModel.create({ user: user_2, friend: [user_1] });
         }
-        const new_follow = await FollowModel.findOne({
-            user: curren_user,
-        }).populate("followers", { _id: 1, username: 1 });
-        return response.status(200).send({ new_follow: new_follow });
+        const friendShip = await FriendShipModel.findOne({ user_1, user_2 });
+        await NotifyFriendModel.deleteOne({ event: friendShip });
+        await FriendShipModel.deleteOne({ user_1: user_1, user_2: user_2 });
+        const notify = await NotifyFriendModel.find({ user: user_2 }).populate({
+            path: "event",
+            populate: { path: "user_1", select: "username avatar" },
+        });
+        return response.status(200).send({ notify });
+    }
+    /**
+     * /user/seen-notify
+     * @param request
+     * @param response
+     * @returns
+     */
+    async seenNotify(request: Request, response: Response) {
+        const { username } = request.body;
+        const user = await UserModel.findOne({ username });
+        await NotifyFriendModel.updateMany({ user }, { seen: true });
+        return response.status(200).send({ result: "succcess" });
+    }
+
+    /**
+     * /user/unfriend
+     * @param request
+     * @param response
+     * @returns
+     */
+    async unFriend(request: Request, response: Response) {
+        const { username_1, username_2 } = request.body;
+        const user_1 = await UserModel.findOne({ username: username_1 });
+        const user_2 = await UserModel.findOne({ username: username_2 });
+        await FriendModel.updateOne(
+            { user: user_1 },
+            { $pullAll: { friend: [user_2] } }
+        );
+
+        await FriendModel.updateOne(
+            { user: user_2 },
+            { $pullAll: { friend: [user_1] } }
+        );
+        const friend = await FriendModel.findOne({ user: user_1 }).populate(
+            "friend",
+            { _id: 1, username: 1, avatar: 1 }
+        );
+        return response.status(200).send({ friend });
     }
 }
 

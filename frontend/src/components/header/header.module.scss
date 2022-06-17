@@ -103,6 +103,64 @@
             margin-left: 20px;
             cursor: pointer;
         }
+        .notify {
+            position: relative;
+            .notify_menu {
+                background-color: #fff;
+                position: absolute;
+                box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+                border-radius: 10px;
+                border: 1px solid lightgray;
+                width: 200px;
+                min-height: 100px;
+                padding: 10px;
+                animation-name: opacityEff;
+                animation-duration: 0.5s;
+                .notify_item {
+                    .user_info {
+                        display: flex;
+                        align-items: center;
+                        img {
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            object-fit: cover;
+                            margin-right: 20px;
+                        }
+                        div {
+                            font-size: 1.1rem;
+                        }
+                    }
+                    .notify_confirm {
+                        display: flex;
+                        align-items: center;
+                        button {
+                            margin: 5px 7px 5px 0;
+                            padding: 5px 10px;
+                            border: none;
+                            color: #fff;
+                            font-weight: 600;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        }
+                        button:first-child {
+                            background-color: rgb(95, 153, 240);
+                        }
+                        button:last-child {
+                            background-color: rgb(240, 87, 49);
+                        }
+                    }
+                }
+            }
+            .num_notify {
+                position: absolute;
+                font-size: 0.8rem;
+                top: 0;
+                right: -10px;
+                color: red;
+                font-weight: 600;
+            }
+        }
     }
 
     .avatar {
@@ -161,5 +219,13 @@
     }
     to {
         height: 60px;
+    }
+}
+@keyframes opacityEff {
+    from {
+        opacity: 0.5;
+    }
+    to {
+        opacity: 1;
     }
 }

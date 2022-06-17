@@ -19,22 +19,31 @@ export const SocketProvider = ({ children }: Props) => {
     const userState = useAppSelector((state) => state.user);
 
     useEffect(() => {
-        if (!socket?.connected) {
+        if (userState.access_token.length > 0) {
+            if (socket) {
+                disconnect();
+            }
             connect();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [userState]);
 
     const connect = () => {
         const s = io(process.env.REACT_APP_URL as string, {
             query: { access_token: userState.access_token },
         });
-        s.on("connect", () => {});
+        s.auth = { username: userState.user.username };
+        s.on("connect", () => {
+            console.log("connected");
+        });
         setSocket(s);
     };
 
     const disconnect = () => {
-        socket?.disconnect();
+        setSocket((prev) => {
+            prev?.disconnect();
+            return prev;
+        });
     };
 
     const contextData = {

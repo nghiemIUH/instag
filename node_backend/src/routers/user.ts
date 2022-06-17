@@ -10,7 +10,12 @@ userRouter.get("/search", UserController.search);
 userRouter.use(authen);
 userRouter.post("/update", UserController.update);
 userRouter.post("/find-user-profile", UserController.findUserProfile);
-userRouter.post("/get-follow", UserController.getFollow);
-userRouter.post("/follow", UserController.follow);
+userRouter.post("/add-friend", UserController.addFriend);
+userRouter.post("/get-notify", UserController.getNotify);
+userRouter.post("/get-friend", UserController.getFriend);
+userRouter.post("/get-friendship", UserController.getFriendShip);
+userRouter.post("/cancel-friendship", UserController.cancelFriendShip);
+userRouter.post("/seen-notify", UserController.seenNotify);
+userRouter.post("/unfriend", UserController.unFriend);
 
 export default userRouter;

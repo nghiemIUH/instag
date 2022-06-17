@@ -9,7 +9,6 @@ import { useAppSelector, useAppDispatch } from "./redux/hooks";
 import UserThunk from "./redux/user/thunk";
 import Profile from "./components/account/profile/Profile";
 import Cookies from "js-cookie";
-import FollowThunk from "./redux/follow/thunk";
 import Chat from "./components/chat/Chat";
 function App() {
     const userState = useAppSelector((state) => state.user);
@@ -20,19 +19,6 @@ function App() {
         dispatch(UserThunk.getUserReload()(refresh_token || ""));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (userState.isLogin) {
-            dispatch(
-                FollowThunk.getFollow()({
-                    access_token: userState.access_token,
-                    username: userState.user.username,
-                })
-            );
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userState]);
 
     return (
         <div className="App">

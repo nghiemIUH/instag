@@ -47,7 +47,8 @@ function PostItem(props: Props) {
             ipt.value += selection.emoji;
         });
         trigger.addEventListener("click", () => picker.togglePicker(trigger));
-    }, [userState.user._id]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const settings = {
         dots: true,

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useContext, memo } from "react";
 import classNames from "classnames/bind";
 import { useAppSelector } from "../../../redux/hooks";
 import style from "./Profile.module.scss";
@@ -12,10 +12,23 @@ import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { UserInfo } from "../../../entities/user";
 import axiosConfig from "../../../configs/axiosConfig";
-import FollowThunk from "../../../redux/follow/thunk";
+import SocketContext from "../../../context/socket";
+import { Socket } from "socket.io-client";
 
 const cls = classNames.bind(style);
+interface FriendType {
+    user: UserInfo;
+    friend: Array<UserInfo>;
+}
+
+interface SocketContextType {
+    socket: Socket | null;
+    connect: () => void;
+    disconnect: () => void;
+}
+
 function Profile() {
+    const { socket } = useContext(SocketContext) as SocketContextType;
     const location = useLocation();
     const username = location.pathname.split("/")[2];
     const dispatch = useAppDispatch();
@@ -24,13 +37,13 @@ function Profile() {
     const [userState, setUserState] = useState<UserInfo | null>(
         currentUser.user.username === username ? currentUser.user : null
     );
+    const [friend, setFriend] = useState<FriendType | null>(null);
+    const [friendShip, setFriendShip] = useState<any>(null);
 
-    const followState = useAppSelector((state) => state.follow);
-
-    const postState = useAppSelector((state) => state.post);
     const [openModal, setOpenModal] = useState(false);
     const [post, setPost] = useState<Array<Post>>([]);
     const [avatar, setAvatar] = useState<File | null>(null);
+    console.log("render");
 
     useEffect(() => {
         if (username !== currentUser.user.username) {
@@ -45,15 +58,51 @@ function Profile() {
                 });
             };
             result().then((response) => {
-                setUserState({ ...response.data.user });
+                setUserState((prev) => response.data.user);
             });
         } else {
-            setUserState(currentUser.user);
+            setUserState((prev) => currentUser.user);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [username]);
 
-    useEffect(() => {
+        const getFriendShip = async () => {
+            return await axiosConfig({
+                isFormData: false,
+                access_token: currentUser.access_token,
+            })({
+                url: "/user/get-friendship",
+                method: "post",
+                data: JSON.stringify({
+                    username_1: currentUser.user.username,
+                    username_2: username,
+                }),
+            });
+        };
+        getFriendShip()
+            .then((response) => {
+                setFriendShip(response.data.friendShip);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        const getFriend = async () => {
+            return await axiosConfig({
+                isFormData: false,
+                access_token: currentUser.access_token,
+            })({
+                url: "/user/get-friend",
+                method: "post",
+                data: JSON.stringify({ username: currentUser.user.username }),
+            });
+        };
+        getFriend()
+            .then((response) => {
+                setFriend(response.data.friend);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
         const result = async () => {
             return await fetch(
                 process.env.REACT_APP_URL + "/post/get-post-by-userid",
@@ -72,10 +121,36 @@ function Profile() {
                 return response.json();
             })
             .then((data) => {
-                setPost(data.posts);
+                setPost((prev) => data.posts);
             });
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [postState, username]);
+    }, []);
+
+    useEffect(() => {
+        socket?.on("get-friendship", (data) => {
+            setFriendShip(data);
+        });
+
+        socket?.on("ac_friend_notify", (data) => {
+            console.log("run");
+
+            setFriend((prev) => {
+                const newState = prev;
+                if (currentUser.user.username === data.username_1)
+                    newState?.friend.push({
+                        username: data.username_2,
+                    } as UserInfo);
+                else
+                    newState?.friend.push({
+                        username: data.username_1,
+                    } as UserInfo);
+                return newState;
+            });
+            setFriendShip(null);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socket]);
 
     const handleEditProfile = async (e: FormEvent) => {
         e.preventDefault();
@@ -140,14 +215,41 @@ function Profile() {
         });
     };
 
-    const handleFollow = async () => {
-        dispatch(
-            FollowThunk.follow_unfollow()({
-                access_token: currentUser.access_token,
-                current_username: currentUser.user.username,
-                other_username: username,
-            })
-        );
+    const handleFriendShip = async () => {
+        socket?.emit("create-friendship", {
+            username_1: currentUser.user.username,
+            username_2: userState?.username,
+        });
+    };
+    const handleCancelFriend = async () => {
+        await axiosConfig({
+            isFormData: false,
+            access_token: currentUser.access_token,
+        })({
+            url: "/user/cancel-friendship",
+            method: "post",
+            data: JSON.stringify({
+                username_1: currentUser.user.username,
+                username_2: username,
+            }),
+        });
+        setFriendShip(null);
+    };
+
+    const handleUnFriend = async () => {
+        await axiosConfig({
+            isFormData: false,
+            access_token: currentUser.access_token,
+        })({
+            url: "/user/unfriend",
+            method: "post",
+            data: JSON.stringify({
+                username_1: currentUser.user.username,
+                username_2: username,
+            }),
+        }).then((response) => {
+            setFriend(response.data.friend);
+        });
     };
 
     return (
@@ -180,27 +282,36 @@ function Profile() {
                                 ) : (
                                     <button
                                         className={cls("btn_follow")}
-                                        onClick={handleFollow}
+                                        onClick={
+                                            friendShip
+                                                ? handleCancelFriend
+                                                : friend?.friend
+                                                      .map((value) => {
+                                                          return value.username;
+                                                      })
+                                                      .includes(username)
+                                                ? handleUnFriend
+                                                : handleFriendShip
+                                        }
                                     >
-                                        {followState.follow?.followers
-                                            ?.map((value) => {
-                                                return value.username;
-                                            })
-                                            .includes(username)
-                                            ? "Unfollow"
-                                            : "Follow"}
+                                        {friendShip
+                                            ? "Cancel invitation"
+                                            : friend?.friend
+                                                  .map((value) => {
+                                                      return value.username;
+                                                  })
+                                                  .includes(username)
+                                            ? "UnFriend"
+                                            : "Add friend"}
                                     </button>
                                 )}
                             </div>
                             <div className={cls("user_info_row_2")}>
                                 <div>
-                                    <span>0</span> post
+                                    <span>{post.length}</span> Post
                                 </div>
                                 <div>
-                                    <span>0</span> followers
-                                </div>
-                                <div>
-                                    <span>0</span> following
+                                    <span>{friend?.friend.length}</span> Friend
                                 </div>
                             </div>
 
@@ -336,4 +447,4 @@ function Profile() {
     );
 }
 
-export default Profile;
+export default memo(Profile);
