@@ -355,7 +355,7 @@ class UserController {
      * @param response
      */
     async getChat(request: Request, response: Response) {
-        const { username_1, username_2 } = request.body;
+        const { username_1, username_2, num_chat } = request.body;
         const user_1 = await UserModel.findOne({ username: username_1 }).select(
             "_id"
         );
@@ -372,7 +372,7 @@ class UserController {
                 username: 1,
             })
             .sort({ date: -1 })
-            .limit(15);
+            .limit(num_chat);
 
         return response.status(200).send({ chat: chat.reverse() });
     }

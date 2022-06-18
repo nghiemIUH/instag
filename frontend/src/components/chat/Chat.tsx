@@ -38,6 +38,24 @@ function Chat() {
         avatar: string;
     } | null>(null);
     const [chat, setChat] = useState<Array<ChatType>>([]);
+    const [num_chat, setNum_chat] = useState(15);
+    const [isScroll, setIsScroll] = useState(true);
+
+    const getChat = async () => {
+        return await axiosConfig({
+            isFormData: false,
+            access_token: userState.access_token,
+        })({
+            url: "/user/get-chat",
+            method: "post",
+            data: JSON.stringify({
+                username_1: userState.user.username,
+                username_2: selectUser?.username,
+                num_chat,
+            }),
+        });
+    };
+    console.log("render");
 
     useEffect(() => {
         const getFriend = async () => {
@@ -50,42 +68,49 @@ function Chat() {
                 data: JSON.stringify({ username: userState.user.username }),
             });
         };
-        getFriend().then((response) => setFriends(response.data.friend));
+        getFriend().then((response) =>
+            setFriends((prev) => response.data.friend)
+        );
+
+        const chat_body = document.getElementById(
+            "chat_body"
+        ) as HTMLDivElement;
+
+        const loadChat = () => {
+            if (chat_body.scrollTop === 0) {
+                setNum_chat((prev) => prev + 15);
+                setIsScroll((prev) => false);
+            }
+        };
+        chat_body.addEventListener("scroll", loadChat);
+        return () => chat_body.removeEventListener("scroll", loadChat);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
     useEffect(() => {
-        const getChat = async () => {
-            return await axiosConfig({
-                isFormData: false,
-                access_token: userState.access_token,
-            })({
-                url: "/user/get-chat",
-                method: "post",
-                data: JSON.stringify({
-                    username_1: userState.user.username,
-                    username_2: selectUser?.username,
-                }),
-            });
-        };
         getChat().then((response) => {
-            setChat(response.data.chat);
+            setChat((prev) => response.data.chat);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectUser]);
+    }, [num_chat, selectUser]);
 
     useEffect(() => {
         socket?.on("re-message", (data) => {
             setChat((prev) => {
                 return [...prev, data.chat];
             });
+            setIsScroll((prev) => true);
         });
     }, [socket]);
+
     useEffect(() => {
-        const chat_body = document.getElementById(
-            "chat_body"
-        ) as HTMLDivElement;
-        chat_body.scrollTop = chat_body.scrollHeight;
-    }, [chat]);
+        if (isScroll) {
+            const chat_body = document.getElementById(
+                "chat_body"
+            ) as HTMLDivElement;
+            chat_body.scrollTop = chat_body.scrollHeight;
+        }
+    }, [chat, isScroll]);
 
     const send = (e: FormEvent) => {
         e.preventDefault();
