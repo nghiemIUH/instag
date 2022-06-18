@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { UserModel, FriendShipModel, NotifyFriendModel } from "../models/user";
+import { GroupModel } from "../models/chat";
 
 const friend_socket = (io: Server, socket: Socket) => {
     socket.on("create-friendship", async (data) => {
@@ -7,6 +8,7 @@ const friend_socket = (io: Server, socket: Socket) => {
         const user_1 = await UserModel.findOne({ username: username_1 });
         const user_2 = await UserModel.findOne({ username: username_2 });
         const friendShip = await FriendShipModel.create({ user_1, user_2 });
+        await GroupModel.create({ users: [user_1, user_2] });
         await NotifyFriendModel.create({
             user: user_2,
             event: friendShip,

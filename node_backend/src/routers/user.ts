@@ -17,5 +17,6 @@ userRouter.post("/get-friendship", UserController.getFriendShip);
 userRouter.post("/cancel-friendship", UserController.cancelFriendShip);
 userRouter.post("/seen-notify", UserController.seenNotify);
 userRouter.post("/unfriend", UserController.unFriend);
+userRouter.post("/get-chat", UserController.getChat);
 
 export default userRouter;

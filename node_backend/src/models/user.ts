@@ -65,40 +65,5 @@ const NotifyFriendSchema = new Schema<NotifyFriend>({
 const NotifyFriendModel = model<NotifyFriend>("Notify", NotifyFriendSchema);
 
 // =====================================================
-interface Group {
-    _id: string;
-    users: Array<any>;
-}
 
-const GroupSchema = new Schema<Group>({
-    users: { type: [Schema.Types.ObjectId], ref: "User" },
-});
-
-const GroupModel = model<Group>("Group", GroupSchema);
-
-interface ChatType {
-    _id: string;
-    group: Group;
-    sender: User;
-    content: string;
-    date: Date;
-}
-
-const ChatSchema = new Schema<ChatType>({
-    group: { type: Schema.Types.ObjectId, ref: "Group" },
-    sender: { type: Schema.Types.ObjectId, ref: "User" },
-    content: { type: String },
-    date: { type: Schema.Types.Date, default: Date.now },
-});
-
-const ChatModel = model<ChatType>("Chat", ChatSchema);
-
-export {
-    User,
-    UserModel,
-    GroupModel,
-    ChatModel,
-    FriendModel,
-    NotifyFriendModel,
-    FriendShipModel,
-};
+export { User, UserModel, FriendModel, NotifyFriendModel, FriendShipModel };

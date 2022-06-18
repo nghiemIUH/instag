@@ -8,6 +8,8 @@ import {
     NotifyFriendModel,
     FriendShipModel,
 } from "../models/user";
+import { GroupModel, ChatModel } from "../models/chat";
+
 import { unlink } from "fs";
 class UserController {
     /**
@@ -345,6 +347,34 @@ class UserController {
             { _id: 1, username: 1, avatar: 1 }
         );
         return response.status(200).send({ friend });
+    }
+
+    /**
+     * /user/get-chat
+     * @param request
+     * @param response
+     */
+    async getChat(request: Request, response: Response) {
+        const { username_1, username_2 } = request.body;
+        const user_1 = await UserModel.findOne({ username: username_1 }).select(
+            "_id"
+        );
+        const user_2 = await UserModel.findOne({ username: username_2 }).select(
+            "_id"
+        );
+
+        const group = await GroupModel.findOne({
+            users: { $all: [user_1, user_2] },
+        });
+        const chat = await ChatModel.find({ group })
+            .populate("sender", {
+                _id: 1,
+                username: 1,
+            })
+            .sort({ date: -1 })
+            .limit(15);
+
+        return response.status(200).send({ chat: chat.reverse() });
     }
 }
 

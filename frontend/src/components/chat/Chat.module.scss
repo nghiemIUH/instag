@@ -83,15 +83,16 @@
         .chat_body {
             height: 85%;
             overflow-y: scroll;
+            scroll-behavior: smooth;
             &::-webkit-scrollbar {
                 display: none;
             }
 
             .chat_friend,
             .chat_own {
-                width: 100%;
+                width: 98%;
                 display: flex;
-                margin: 10px 5px;
+                padding: 10px 5px;
                 img {
                     width: 40px;
                     height: 40px;
@@ -101,9 +102,9 @@
                 p {
                     line-height: 1.5;
                     font-size: 0.9rem;
-                    width: 65%;
+                    max-width: 65%;
                     border: 1px solid lightgray;
-                    padding: 10px 5px;
+                    padding: 10px 15px;
                     border-radius: 10px;
                     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
                 }
